@@ -5,7 +5,7 @@ const app = express()
 const port = process.env.PORT || 8080
 
 const deta = Deta()
-const db = deta.Base("test")
+const db = deta.Base("echo")
 
 app.get("/", (req, res) => {
   res.send("Hello from Space! 🚀")
