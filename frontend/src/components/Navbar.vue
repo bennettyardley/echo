@@ -7,12 +7,15 @@
       <p class="font-bold text-xl">Echo</p>
     </div>
     <div class="navbar-end">
-      <button class="btn btn-ghost btn-circle">+</button>
+      <NewEntryModal /> 
     </div>
   </div>
 </template>
 
 <script>
+
+import NewEntryModal from '../components/NewEntryModal.vue'
+
   export default {
     name: 'Navbar',
     methods: {
@@ -20,6 +23,9 @@
         this.$router.push('/')
       },
     },
+    components: {
+    NewEntryModal,
+  },
   }
 </script>
 
