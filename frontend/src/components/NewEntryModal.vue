@@ -1,43 +1,114 @@
 <template>
-    <div>
-      <button class="btn btn-ghost btn-circle" @click="openModal">+</button>
-      <dialog id="my_modal_3" class="modal">
-        <div class="modal-box flex flex-col items-center justify-center min-h-[50vh] max-h-[80vh]">
-          <form method="dialog" class="text-center">
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeModal">✕</button>
-            <h3 class="font-bold text-xl">Hello!</h3>
-            <p class="py-4">A Curse upon Your Bloodline</p>
-            <div class="mb-4">
-              <VueDatePicker :enable-time-picker="false" :max-date="new Date()" class="bg-primary rounded" dark />
-            </div>
-              <div class="mb-4">
-              <v-select multiple taggable push-tags :options="allArtists" v-model="artists" class="bg-primary rounded">Search or add an Artist</v-select>
-            </div>
-            <div class="mb-4">
-              <v-select taggable push-tags :options="allVenues" class="bg-primary rounded">Search or add a Venue</v-select>
-            </div>            
-            <button class="btn btn-primary mt-4" @click="closeModal">ADD New Entry</button>
-          </form>
-        </div>
-      </dialog>
+  <div>
+    <label for="entryModal" class="btn btn-ghost btn-circle">+</label>
+
+    <input type="checkbox" v-model="open" id="entryModal" class="modal-toggle" />
+    <div class="modal">
+      <div class="modal-box flex max-w-none w-3/5 h-3/4 justify-center">
+        <form method="dialog" class="text-center w-3/5">
+          <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeModal">✕</button>
+          <h3 class="font-bold text-xl mt-6">Had Fun? Log your concert:</h3>
+          <div class="mt-6">
+            <v-select
+              multiple
+              taggable
+              push-tags
+              :options="allArtists"
+              v-model="artists"
+              placeholder="Who'd You See?"
+              class="outline outline-secondary rounded"></v-select>
+          </div>
+          <div class="mt-6">
+            <v-select
+              taggable
+              push-tags
+              :options="allVenues"
+              v-model="venue"
+              placeholder="Where'd You Go?"
+              class="outline outline-secondary rounded"></v-select>
+          </div>
+          <div class="mt-6">
+            <VueDatePicker
+              :enable-time-picker="false"
+              position="center"
+              v-model="entryDate"
+              class="outline outline-secondary rounded"
+              dark />
+          </div>
+          <div class="mt-40">
+            <button class="btn btn-primary" @click="submit">ADD New Entry</button>
+          </div>
+        </form>
+      </div>
+      <label class="modal-backdrop" for="entryModal">Close</label>
     </div>
-  </template>
-  
-  <script>
+  </div>
+</template>
+
+<script>
   export default {
     name: 'NewEntryModal',
     methods: {
-      openModal() {
-        const modal = document.getElementById('my_modal_3');
-        modal.showModal();
-      },
       closeModal() {
-        const modal = document.getElementById('my_modal_3');
-        modal.close();
+        this.open = false
+      },
+      submit() {
+        let id = 'a'
+        this.$router.push('/entry/' + id)
+        this.open = false
       },
     },
-  };
-  </script>
-  
-  <style> </style>
-  
+    data: () => ({
+      allArtists: [],
+      allVenues: [],
+      artists: [],
+      venue: '',
+      entryDate: new Date(),
+      open: false,
+    }),
+  }
+</script>
+
+<style>
+  * {
+    --vs-controls-color: #e9e5ff;
+
+    --vs-dropdown-bg: #302f3d;
+    --vs-dropdown-color: #e9e5ff;
+    --vs-dropdown-option-color: #e9e5ff;
+
+    --vs-selected-bg: #e679c0;
+    --vs-selected-color: #e9e5ff;
+  }
+  .dp__theme_dark {
+    --dp-background-color: #302f3d;
+    --dp-text-color: #e9e5ff;
+    --dp-hover-color: #e679c0;
+    --dp-hover-text-color: #302f3d;
+    --dp-hover-icon-color: #e9e5ff;
+    --dp-primary-color: #e679c0;
+    --dp-primary-text-color: #ffffff;
+    --dp-secondary-color: #a9a9a9;
+    --dp-border-color: #2d2d2d;
+    --dp-menu-border-color: #2d2d2d;
+    --dp-border-color-hover: #e679c0;
+    --dp-disabled-color: #737373;
+    --dp-scroll-bar-background: #212121;
+    --dp-scroll-bar-color: #484848;
+    --dp-success-color: #00701a;
+    --dp-success-color-disabled: #428f59;
+    --dp-icon-color: #e9e5ff;
+    --dp-danger-color: #e53935;
+    --dp-highlight-color: rgba(0, 92, 178, 0.2);
+  }
+  .pagination {
+    display: flex;
+    margin: 0.25rem 0.25rem 0;
+  }
+  .pagination button {
+    flex-grow: 1;
+  }
+  .pagination button:hover {
+    cursor: pointer;
+  }
+</style>

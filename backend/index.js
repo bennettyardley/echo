@@ -1,7 +1,9 @@
 const express = require('express')
 const { Deta } = require('deta')
+const multer = require('multer')
 
 const app = express()
+const upload = multer({ dest: 'uploads/' })
 // eslint-disable-next-line no-undef
 const port = process.env.PORT || 8080
 
@@ -190,6 +192,12 @@ app.get('/stats', async (req, res) => {
 
 app.get('/top', async (req, res) => {
   const allEntries = await db.fetch()
+})
+
+app.post('/upload', upload.array('media'), function (req, res, next) {
+  // req.files is array of `photos` files
+  // req.body will contain the text fields, if there were any
+  console.log(req.files)
 })
 
 app.listen(port, () => {

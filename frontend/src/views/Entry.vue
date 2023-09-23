@@ -1,10 +1,22 @@
 <template>
   <div>
     <Navbar />
-    <div class="container mx-auto max-w-3xl">
-      <v-select taggable push-tags :options="['Test']" class="text-primary-content rounded">Search or add an Artist</v-select>
-      <VueDatePicker :enable-time-picker="false" :max-date="new Date()" dark />
+    <v-select multiple taggable push-tags :options="allArtists" v-model="artists" class="outline outline-secondary rounded"></v-select>
+    <v-select taggable push-tags :options="allVenues" v-model="venue" class="outline outline-secondary rounded"></v-select>
+    <VueDatePicker :enable-time-picker="false" position="center" v-model="entryDate" dark class="outline outline-secondary rounded" />
+    <textarea class="textarea" placeholder="Comments"></textarea>
+    <form action="localhost:4202/api/upload" method="post" enctype="multipart/form-data">
+      <input type="file" class="file-input w-full max-w-xs" />
+      <input type="submit" class="btn" />
+    </form>
+    <div class="rating gap-1">
+      <input type="radio" name="rating-3" class="mask mask-star-2 bg-red-400" />
+      <input type="radio" name="rating-3" class="mask mask-star-2 bg-orange-400" checked />
+      <input type="radio" name="rating-3" class="mask mask-star-2 bg-yellow-400" />
+      <input type="radio" name="rating-3" class="mask mask-star-2 bg-lime-400" />
+      <input type="radio" name="rating-3" class="mask mask-star-2 bg-green-400" />
     </div>
+    Favorite Share
   </div>
 </template>
 
@@ -18,26 +30,4 @@
   }
 </script>
 
-<style>
-  .dp__theme_dark {
-    --dp-background-color: #302f3d;
-    --dp-text-color: #e9e5ff;
-    --dp-hover-color: #e679c0;
-    --dp-hover-text-color: #302f3d;
-    --dp-hover-icon-color: #959595;
-    --dp-primary-color: #e679c0;
-    --dp-primary-text-color: #ffffff;
-    --dp-secondary-color: #a9a9a9;
-    --dp-border-color: #2d2d2d;
-    --dp-menu-border-color: #2d2d2d;
-    --dp-border-color-hover: #aaaeb7;
-    --dp-disabled-color: #737373;
-    --dp-scroll-bar-background: #212121;
-    --dp-scroll-bar-color: #484848;
-    --dp-success-color: #00701a;
-    --dp-success-color-disabled: #428f59;
-    --dp-icon-color: #959595;
-    --dp-danger-color: #e53935;
-    --dp-highlight-color: rgba(0, 92, 178, 0.2);
-  }
-</style>
+<style></style>
