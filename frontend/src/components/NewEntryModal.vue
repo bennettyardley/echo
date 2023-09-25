@@ -12,18 +12,18 @@
             <v-select
               multiple
               taggable
-              push-tags
               :options="form.allArtists"
               v-model="newArtists"
+              @change="updateArtistsNew"
               placeholder="Who'd You See?"
               class="outline outline-secondary rounded"></v-select>
           </div>
           <div class="mt-6">
             <v-select
               taggable
-              push-tags
               :options="form.allVenues"
               v-model="newVenue"
+              @change="updateVenuesNew"
               placeholder="Where'd You Go?"
               class="outline outline-secondary rounded"></v-select>
           </div>
@@ -62,10 +62,8 @@
       newEntryDate: new Date(),
       open: false,
     }),
-    watch: {
-      newArtists: async function () {
-        await form.refresh()
-      },
+    async beforeMount() {
+      if (this.form.allArtists.length === 0 || this.form.allVenues.length === 0) await this.form.refresh()
     },
     methods: {
       closeModal() {
@@ -79,6 +77,16 @@
         })
         this.$router.push('/entry/' + response.data.id)
         this.open = false
+      },
+      updateArtistsNew() {
+        if (typeof this.newArtists.slice(-1)[0] === 'string') {
+          this.form.addArtist(this.newArtists.slice(-1)[0])
+        } else {
+          this.form.addArtist(this.newArtists.slice(-1)[0].label)
+        }
+      },
+      updateVenuesNew() {
+        this.form.addVenue(this.newVenue)
       },
     },
   }

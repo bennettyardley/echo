@@ -14,5 +14,17 @@ export const formStore = defineStore('form', {
       this.allVenues = response.data.venues
       localStorage.setItem('allVenues', JSON.stringify(response.data.venues))
     },
+    addArtist(artist) {
+      if (!this.allArtists.includes(artist)) {
+        this.allArtists.push(artist)
+        localStorage.setItem('allArtists', JSON.stringify(this.allArtists))
+      }
+    },
+    addVenue(venue) {
+      if (!this.allVenues.includes(venue)) {
+        this.allVenues.push(venue)
+        localStorage.setItem('allVenues', JSON.stringify(this.allVenues))
+      }
+    },
   },
 })

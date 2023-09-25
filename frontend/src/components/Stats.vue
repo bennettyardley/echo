@@ -20,8 +20,14 @@
 </template>
 
 <script>
+  import axios from 'axios'
+
   export default {
     name: 'Stats',
+    async beforeMount() {
+      const response = await axios.get('http://localhost:4202/stats')
+      console.log(response.data)
+    },
   }
 </script>
 

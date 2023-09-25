@@ -11,14 +11,23 @@
             <th class="px-0">
               <div class="flex">
                 <label class="swap swap-rotate mx-auto">
-                  <input type="checkbox" :checked="entry.favorite" />
+                  <input type="checkbox" :checked="entry.favorite" @change="updateFavorite($event)" :id="entry.id" />
                   <div class="swap-off">🤍</div>
                   <div class="swap-on">❤️</div>
                 </label>
               </div>
             </th>
             <td class="pl-2">
-              <a @click="peek($event, 'artist', entry.artists.split(','[0]))" class="link link-hover">{{ entry.artists }}</a>
+              <div class="flex">
+                <a
+                  v-for="(artist, index) in entry.artists.split(', ')"
+                  :key="artist"
+                  @click="peek($event, 'artist', artist)"
+                  class="link link-hover">
+                  <p v-if="index === entry.artists.split(', ').length - 1">{{ artist }}</p>
+                  <p v-else>{{ artist }},&nbsp;</p>
+                </a>
+              </div>
             </td>
             <td>
               <a @click="peek($event, 'venue', entry.venue)" class="link link-hover">{{ entry.venue }}</a>
@@ -61,10 +70,20 @@
     methods: {
       peek(into, type, link) {
         if (into.target.nodeName && into.target.nodeName.toLowerCase() === 'td') this.$router.push('/entry/' + link)
+        else if (into.target.nodeName && into.target.nodeName.toLowerCase() === 'div' && into.target.className !== 'swap-on')
+          this.$router.push('/entry/' + link)
         else {
           if (type === 'artist') console.log('Going to ' + type + ': ' + link)
           else if (type === 'venue') console.log('Going to ' + type + ': ' + link)
         }
+      },
+      updateFavorite(event) {
+        axios
+          .patch('http://localhost:4202/entry', { id: event.target.id, favorite: event.target.checked })
+          .then((res) => {})
+          .catch((err) => {
+            console.log(err)
+          })
       },
     },
   }

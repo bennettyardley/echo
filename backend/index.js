@@ -9,7 +9,6 @@ app.use(cors())
 app.use(bodyParser.json())
 
 const upload = multer({ dest: './tmp/media/' })
-// eslint-disable-next-line no-undef
 const port = process.env.PORT || 8080
 
 const deta = Deta()
@@ -60,29 +59,32 @@ function yearStats(entries) {
   const currentYearCount = currentYearEntries.length
   const previousYearCount = previousYearEntries.length
 
-  const percentChange = previousYearCount !== 0 ? ((currentYearCount - previousYearCount) / previousYearCount) * 100 : 0
+  const percentChange = previousYearCount !== 0 ? ((currentYearCount - previousYearCount) / previousYearCount) * 100 : 100
 
-  const uniqueArtistsCurrentYear = new Set()
-  currentYearEntries.forEach((entry) => {
-    if (entry.artist) uniqueArtistsCurrentYear.add(entry.artist)
-  })
+  const uniqueArtistsCurrentYear = []
+  for (let entry of currentYearEntries) {
+    for (let artist of entry.artists) {
+      if (!uniqueArtistsCurrentYear.includes(artist)) uniqueArtistsCurrentYear.push(artist)
+    }
+  }
 
-  const uniqueArtistsPreviousYear = new Set()
-  previousYearEntries.forEach((entry) => {
-    if (entry.artist) uniqueArtistsPreviousYear.add(entry.artist)
-  })
+  const uniqueArtistsPreviousYear = []
+  for (let entry of previousYearEntries) {
+    for (let artist of entry.artists) {
+      if (!uniqueArtistsPreviousYear.includes(artist)) uniqueArtistsPreviousYear.push(artist)
+    }
+  }
 
   const currentYearUniqueCount = uniqueArtistsCurrentYear.length
   const previousYearUniqueCount = uniqueArtistsPreviousYear.length
 
   const uniquePercentChange =
-    previousYearUniqueCount !== 0 ? ((currentYearUniqueCount - previousYearUniqueCount) / previousYearUniqueCount) * 100 : 0
+    previousYearUniqueCount !== 0 ? ((currentYearUniqueCount - previousYearUniqueCount) / previousYearUniqueCount) * 100 : 100
 
   return {
     currentYearCount,
-    previousYearCount,
     percentChange,
-    unique: uniqueArtistsCurrentYear.size,
+    unique: currentYearUniqueCount,
     uniquePercent: uniquePercentChange,
   }
 }
@@ -137,9 +139,9 @@ app.get('/formData', async (req, res) => {
   let venues = []
   let artists = []
   for (let entry of allEntries.items) {
-    if (!venues.includes(entry.venue)) venues.push(entry.venue)
+    if (!venues.includes(entry.venue) && entry.venue !== null) venues.push(entry.venue)
     for (let artist of entry.artists) {
-      if (!artists.includes(artist)) artists.push(artist)
+      if (!artists.includes(artist) && artist !== null) artists.push(artist)
     }
   }
   res.json({ venues, artists })
@@ -179,7 +181,7 @@ app.get('/venue/:venue', async (req, res) => {
 
 app.get('/stats', async (req, res) => {
   const allEntries = await db.fetch()
-  const stats = yearStats(allEntries)
+  const stats = yearStats(allEntries.items)
 
   res.json({
     year: {
@@ -195,9 +197,11 @@ app.get('/stats', async (req, res) => {
 
 app.get('/top', async (req, res) => {
   const allEntries = await db.fetch()
+  calculateTopEntries(allEntries.items)
+  res.sendStatus(200)
 })
 
-app.post('/upload', upload.array('media'), function (req, res, next) {
+app.post('/upload', upload.array('media'), function (req, res) {
   // req.files is array of `photos` files
   // req.body will contain the text fields, if there were any
   console.log(req.files)
@@ -210,8 +214,10 @@ app.patch('/entry', async (req, res) => {
     if (key !== 'id') update[key] = req.body[key]
   }
   try {
-    const entry = await db.update(update, req.body.id)
-  } catch (err) {}
+    await db.update(update, req.body.id)
+  } catch (err) {
+    console.log(err)
+  }
   res.sendStatus(200)
 })
 
@@ -232,6 +238,12 @@ app.get('/entries/:page', async (req, res) => {
   const start = (req.params.page - 1) * 10
   const end = Math.min(start + 10, allEntries.count)
 
+  allEntries.items.sort((a, b) => {
+    const dateA = new Date(a.date)
+    const dateB = new Date(b.date)
+    return dateB - dateA
+  })
+
   const slicedEntries = allEntries.items.slice(start, end)
 
   const entries = []
@@ -246,6 +258,11 @@ app.get('/entries/:page', async (req, res) => {
   }
 
   res.status(200).json({ pages, entries })
+})
+
+app.delete('/entry/:id', async (req, res) => {
+  await db.delete(req.params.id)
+  res.sendStatus(200)
 })
 
 app.listen(port, () => {

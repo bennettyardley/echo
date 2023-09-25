@@ -6,8 +6,19 @@
       <div class="swap-off">🤍</div>
       <div class="swap-on">❤️</div>
     </label>
-    <v-select multiple taggable push-tags :options="allArtists" v-model="artists" class="outline outline-secondary rounded"></v-select>
-    <v-select taggable push-tags :options="allVenues" v-model="venue" class="outline outline-secondary rounded"></v-select>
+    <v-select
+      multiple
+      taggable
+      :options="form.allArtists"
+      v-model="artists"
+      @change="updateArtists"
+      class="outline outline-secondary rounded"></v-select>
+    <v-select
+      taggable
+      :options="form.allVenues"
+      v-model="venue"
+      @change="updateVenues"
+      class="outline outline-secondary rounded"></v-select>
     <VueDatePicker :enable-time-picker="false" position="center" v-model="entryDate" dark class="outline outline-secondary rounded" />
     <textarea class="textarea" v-model="comment" placeholder="Comments"></textarea>
     <div class="rating gap-1" @change="updateRating">
@@ -19,6 +30,7 @@
     </div>
     <Share />
     <Upload />
+    <button @click="deleteEntry" class="btn btn-error">Delete</button>
   </div>
 </template>
 
@@ -26,11 +38,17 @@
   import Navbar from '../components/Navbar.vue'
   import Upload from '../components/Upload.vue'
   import Share from '../components/Share.vue'
+  import { formStore } from '../stores/form'
 
   import axios from 'axios'
   import _debounce from 'lodash/debounce'
 
   export default {
+    setup() {
+      const form = formStore()
+
+      return { form }
+    },
     components: {
       Navbar,
       Upload,
@@ -114,6 +132,20 @@
           .catch((err) => {
             console.log(err)
           })
+      },
+      updateArtists() {
+        if (typeof this.artists.slice(-1)[0] === 'string') {
+          this.form.addArtist(this.artists.slice(-1)[0])
+        } else {
+          this.form.addArtist(this.artists.slice(-1)[0].label)
+        }
+      },
+      updateVenues() {
+        this.form.addVenue(this.venue)
+      },
+      async deleteEntry() {
+        await axios.delete('http://localhost:4202/entry/' + this.id)
+        this.$router.push('/')
       },
     },
   }
