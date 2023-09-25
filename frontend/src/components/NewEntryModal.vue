@@ -13,7 +13,7 @@
               multiple
               taggable
               push-tags
-              :options="newAllArtists"
+              :options="form.allArtists"
               v-model="newArtists"
               placeholder="Who'd You See?"
               class="outline outline-secondary rounded"></v-select>
@@ -22,7 +22,7 @@
             <v-select
               taggable
               push-tags
-              :options="newAllVenues"
+              :options="form.allVenues"
               v-model="newVenue"
               placeholder="Where'd You Go?"
               class="outline outline-secondary rounded"></v-select>
@@ -47,17 +47,26 @@
 
 <script>
   import axios from 'axios'
+  import { formStore } from '../stores/form'
 
   export default {
+    setup() {
+      const form = formStore()
+
+      return { form }
+    },
     name: 'NewEntryModal',
     data: () => ({
-      newAllArtists: [],
-      newAllVenues: [],
       newArtists: [],
       newVenue: '',
       newEntryDate: new Date(),
       open: false,
     }),
+    watch: {
+      newArtists: async function () {
+        await form.refresh()
+      },
+    },
     methods: {
       closeModal() {
         this.open = false
@@ -71,12 +80,6 @@
         this.$router.push('/entry/' + response.data.id)
         this.open = false
       },
-    },
-
-    async beforeMount() {
-      const response = await axios.get('http://localhost:4202/formData')
-      this.newAllArtists = response.data.artists
-      this.newAllVenues = response.data.venues
     },
   }
 </script>

@@ -38,8 +38,6 @@
     },
     data() {
       return {
-        allArtists: [],
-        allVenues: [],
         artists: [],
         venue: '',
         entryDate: null,
@@ -49,6 +47,8 @@
         media: [],
         rate: { 1: false, 2: false, 3: false, 4: false, 5: false },
         id: this.$route.params.id,
+        first: true,
+        second: true,
       }
     },
     watch: {
@@ -76,6 +76,10 @@
     },
     methods: {
       updateComment: _debounce(function (value) {
+        if (this.second) {
+          this.second = false
+          return
+        }
         axios
           .patch('http://localhost:4202/entry', { id: this.id, comment: value })
           .then((res) => {})
@@ -84,6 +88,10 @@
           })
       }, 1500),
       updateOther: _debounce(function () {
+        if (this.first) {
+          this.first = false
+          return
+        }
         axios
           .patch('http://localhost:4202/entry', { id: this.id, artists: this.artists, venue: this.venue, date: this.entryDate })
           .then((res) => {})
