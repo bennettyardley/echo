@@ -89,26 +89,17 @@ function yearStats(entries) {
   }
 }
 
-function calculateTopEntries(entries, artistName, dateRange) {
-  // Get the current date
-  const currentDate = new Date()
-
-  // Define time intervals in milliseconds for last year and last decade
+function calculateTopArtistsAndVenues(entries, dateRange) {
   const oneYear = 365 * 24 * 60 * 60 * 1000
   const oneDecade = 10 * oneYear
 
-  // Filter entries by artist name
   const filteredEntries = entries.filter((entry) => {
-    return entry.artist === artistName
-  })
-
-  // Filter entries by date range
-  const filteredEntriesByDate = filteredEntries.filter((entry) => {
     const entryDate = new Date(entry.date)
+    const currentDate = new Date()
 
     switch (dateRange) {
       case 'allTime':
-        return true // No date filter for all time
+        return true
       case 'lastYear':
         return currentDate - entryDate <= oneYear
       case 'lastDecade':
@@ -118,18 +109,32 @@ function calculateTopEntries(entries, artistName, dateRange) {
     }
   })
 
-  // Sort entries by a relevant metric (e.g., by date or another field)
-  // Replace 'date' with the actual field you want to sort by
-  filteredEntriesByDate.sort((a, b) => {
-    const dateA = new Date(a.date)
-    const dateB = new Date(b.date)
-    return dateB - dateA // Sort in descending order by date
+  const artistCount = {}
+  const venueCount = {}
+
+  filteredEntries.forEach((entry) => {
+    entry.artists.forEach((artist) => {
+      artistCount[artist] = (artistCount[artist] || 0) + 1
+    })
+
+    const venue = entry.venue
+    venueCount[venue] = (venueCount[venue] || 0) + 1
   })
 
-  // Get the top 5 entries
-  const topEntries = filteredEntriesByDate.slice(0, 5)
+  const topArtists = Object.entries(artistCount)
+    .map(([artist, count]) => ({ artist, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5)
 
-  return topEntries
+  const topVenues = Object.entries(venueCount)
+    .map(([venue, count]) => ({ venue, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5)
+
+  return {
+    topArtists,
+    topVenues,
+  }
 }
 
 app.options('*', cors())
@@ -139,20 +144,32 @@ app.get('/formData', async (req, res) => {
   let venues = []
   let artists = []
   for (let entry of allEntries.items) {
-    if (!venues.includes(entry.venue) && entry.venue !== null) venues.push(entry.venue)
+    if (!venues.includes(entry.venue) && entry.venue !== null && entry.venue !== undefined && entry.venue !== '') venues.push(entry.venue)
     for (let artist of entry.artists) {
-      if (!artists.includes(artist) && artist !== null) artists.push(artist)
+      if (!artists.includes(artist) && artist !== null && artist !== undefined && artist !== '') artists.push(artist)
     }
   }
   res.json({ venues, artists })
 })
 
-app.get('/artist/:artist', async (req, res) => {
-  const entries = await db.fetch({ 'artists?contains': req.params.artist })
-  let formattedEntries = []
-  let media = []
-  for (let entry in entries.items) {
-    formattedEntries.push({
+app.get('/artist/:artist/:page', async (req, res) => {
+  const allEntries = await db.fetch({ 'artists?contains': req.params.artist })
+  const pages = Math.ceil(allEntries.count / 10)
+
+  const start = (req.params.page - 1) * 10
+  const end = Math.min(start + 10, allEntries.count)
+
+  allEntries.items.sort((a, b) => {
+    const dateA = new Date(a.date)
+    const dateB = new Date(b.date)
+    return dateB - dateA
+  })
+
+  const slicedEntries = allEntries.items.slice(start, end)
+
+  const entries = []
+  for (let entry of slicedEntries) {
+    entries.push({
       favorite: entry.favorite,
       artists: entry.artists.join(', '),
       venue: entry.venue,
@@ -160,15 +177,28 @@ app.get('/artist/:artist', async (req, res) => {
       id: entry.key,
     })
   }
-  res.json({ entries: formattedEntries, media })
+
+  res.status(200).json({ pages, entries, count: allEntries.count })
 })
 
-app.get('/venue/:venue', async (req, res) => {
-  const entries = await db.fetch({ venue: req.params.venue })
-  let formattedEntries = []
-  let media = []
-  for (let entry in entries.items) {
-    formattedEntries.push({
+app.get('/venue/:venue/:page', async (req, res) => {
+  const allEntries = await db.fetch({ venue: req.params.venue })
+  const pages = Math.ceil(allEntries.count / 10)
+
+  const start = (req.params.page - 1) * 10
+  const end = Math.min(start + 10, allEntries.count)
+
+  allEntries.items.sort((a, b) => {
+    const dateA = new Date(a.date)
+    const dateB = new Date(b.date)
+    return dateB - dateA
+  })
+
+  const slicedEntries = allEntries.items.slice(start, end)
+
+  const entries = []
+  for (let entry of slicedEntries) {
+    entries.push({
       favorite: entry.favorite,
       artists: entry.artists.join(', '),
       venue: entry.venue,
@@ -176,7 +206,8 @@ app.get('/venue/:venue', async (req, res) => {
       id: entry.key,
     })
   }
-  res.json({ entries: formattedEntries, media })
+
+  res.status(200).json({ pages, entries, count: allEntries.count })
 })
 
 app.get('/stats', async (req, res) => {
@@ -186,19 +217,26 @@ app.get('/stats', async (req, res) => {
   res.json({
     year: {
       num: `${stats.currentYearCount}`,
-      pct: `${stats.percentChange.toFixed(2)}%`,
+      pct:
+        stats.percentChange > 0
+          ? `${Math.floor(stats.percentChange)}% more than last year`
+          : `${Math.floor(Math.abs(stats.percentChange))}% less than last year`,
     },
     unique: {
       num: `${stats.unique}`,
-      pct: `${stats.uniquePercent.toFixed(2)}%`,
+
+      pct:
+        stats.uniquePercent > 0
+          ? `${Math.floor(stats.uniquePercent)}% more than last year`
+          : `${Math.floor(Math.abs(stats.uniquePercent))}% less than last year`,
     },
   })
 })
 
-app.get('/top', async (req, res) => {
+app.get('/top/:range', async (req, res) => {
   const allEntries = await db.fetch()
-  calculateTopEntries(allEntries.items)
-  res.sendStatus(200)
+  const top = calculateTopArtistsAndVenues(allEntries.items, req.params.range)
+  res.sendStatus(200).json(top)
 })
 
 app.post('/upload', upload.array('media'), function (req, res) {

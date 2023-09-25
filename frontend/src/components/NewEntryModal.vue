@@ -1,7 +1,6 @@
 <template>
   <div>
     <label for="entryModal" class="btn btn-ghost btn-circle">+</label>
-
     <input type="checkbox" v-model="open" id="entryModal" class="modal-toggle" />
     <div class="modal">
       <div class="modal-box flex max-w-none w-3/5 h-3/4 justify-center">
@@ -79,11 +78,7 @@
         this.open = false
       },
       updateArtistsNew() {
-        if (typeof this.newArtists.slice(-1)[0] === 'string') {
-          this.form.addArtist(this.newArtists.slice(-1)[0])
-        } else {
-          this.form.addArtist(this.newArtists.slice(-1)[0].label)
-        }
+        this.form.addArtist(this.newArtists.slice(-1)[0])
       },
       updateVenuesNew() {
         this.form.addVenue(this.newVenue)

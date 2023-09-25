@@ -4,15 +4,15 @@
       <div class="stats bg-accent text-primary-content">
         <div class="stat">
           <div class="stat-title text-primary-content">Concerts This Year</div>
-          <div class="stat-value">13</div>
-          <div class="stat-desc text-primary-content">21% more than last year</div>
+          <div class="stat-value">{{ year.num }}</div>
+          <div class="stat-desc text-primary-content">{{ year.pct }}</div>
         </div>
       </div>
       <div class="stats bg-primary text-primary-content">
         <div class="stat">
           <div class="stat-title text-primary-content">Unique Artists</div>
-          <div class="stat-value">11</div>
-          <div class="stat-desc text-primary-content">5% more than last year</div>
+          <div class="stat-value">{{ unique.num }}</div>
+          <div class="stat-desc text-primary-content">{{ unique.pct }}</div>
         </div>
       </div>
     </div>
@@ -24,9 +24,16 @@
 
   export default {
     name: 'Stats',
-    async beforeMount() {
+    data() {
+      return {
+        year: {},
+        unique: {},
+      }
+    },
+    async mounted() {
       const response = await axios.get('http://localhost:4202/stats')
-      console.log(response.data)
+      this.year = response.data.year
+      this.unique = response.data.unique
     },
   }
 </script>

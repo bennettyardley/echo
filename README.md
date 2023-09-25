@@ -54,39 +54,6 @@ entry: {
     favorite bool,
 }
 
-/artists
-R
-{
-    artists [str]
-}
-
-/venues
-R
-{
-    venues [str]
-}
-
-/artist/:artist
-R
-{
-    entries {favorite, artists, venue, date, id},
-    media [str]
-}
-
-/venue/:venue
-R
-{
-    entries {favorite, artists, venue, date, id},
-    media [str]
-}
-
-/stats
-R - json of stats
-{
-    year: {num, pct},
-    unique: {num, pct}
-}
-
 /top
 R - json of top 5 artists and venues
 in: {
@@ -98,51 +65,6 @@ out: {
     artist str,
 } 
 
-/entries
-R - json of last 10 entries (paginated)
-in: {
-    page int
-}
-out: {
-    favorite bool,
-    artists str (comma seperated),
-    venue str,
-    date str (formatted as x y ago),
-    id str,
-}
 
 
-/entry
-C
-{
-    artists [str]
-    venue str
-    date date
-}
-R
-{
-    id str
-}
-{
-    artists [str],
-    venue str,
-    date str,
-    comment str,
-    media [str],
-    rating int,
-    favorite bool,
-}
-U 
-{
-    artists [str],
-    venue str,
-    date str,
-    comment str,
-    media [str],
-    rating int,
-    favorite bool, 
-}
-D
-{
-    id str
-}
+

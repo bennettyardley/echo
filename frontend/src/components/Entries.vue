@@ -1,14 +1,21 @@
 <template>
   <div>
     <div class="card card-bordered overflow-hidden">
-      <table class="table">
+      <table v-if="table.length === 0" class="table">
+        <tbody>
+          <tr class="hover:bg-secondary hover:text-primary-content">
+            <td>No Entries Yet</td>
+          </tr>
+        </tbody>
+      </table>
+      <table v-else class="table">
         <tbody>
           <tr
             v-for="entry in table"
             :key="entry.id"
             @click="peek($event, 'entry', entry.id)"
             class="hover:bg-secondary hover:text-primary-content">
-            <th class="px-0">
+            <th class="px-3">
               <div class="flex">
                 <label class="swap swap-rotate mx-auto">
                   <input type="checkbox" :checked="entry.favorite" @change="updateFavorite($event)" :id="entry.id" />
@@ -17,8 +24,8 @@
                 </label>
               </div>
             </th>
-            <td class="pl-2">
-              <div class="flex">
+            <td class="pl-0">
+              <div class="flex flex-wrap inline-block">
                 <a
                   v-for="(artist, index) in entry.artists.split(', ')"
                   :key="artist"
@@ -42,7 +49,9 @@
         <button
           v-for="n in pages"
           :key="n"
-          class="join-item btn btn-outline border-transparent hover:bg-transparent hover:text-primary-content hover:border-transparent">
+          class="join-item btn btn-outline border-transparent hover:bg-transparent hover:text-neutral-focus hover:border-transparent"
+          :class="{ activate: n === page }"
+          @click="pageTo(n)">
           {{ n }}
         </button>
       </div>
@@ -59,7 +68,7 @@
       return {
         table: [],
         page: 1,
-        pages: 3,
+        pages: 1,
       }
     },
     async beforeMount() {
@@ -73,8 +82,8 @@
         else if (into.target.nodeName && into.target.nodeName.toLowerCase() === 'div' && into.target.className !== 'swap-on')
           this.$router.push('/entry/' + link)
         else {
-          if (type === 'artist') console.log('Going to ' + type + ': ' + link)
-          else if (type === 'venue') console.log('Going to ' + type + ': ' + link)
+          if (type === 'artist') this.$router.push('/artist/' + link)
+          else if (type === 'venue') this.$router.push('/venue/' + link)
         }
       },
       updateFavorite(event) {
@@ -85,8 +94,19 @@
             console.log(err)
           })
       },
+      async pageTo(n) {
+        if (n === this.page) return
+        const response = await axios.get('http://localhost:4202/entries/' + n)
+        this.table = response.data.entries
+        this.pages = response.data.pages
+        this.page = n
+      },
     },
   }
 </script>
 
-<style></style>
+<style>
+  .activate {
+    color: #1b1c22;
+  }
+</style>
