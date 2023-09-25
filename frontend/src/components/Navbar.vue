@@ -7,14 +7,13 @@
       <p class="font-bold text-xl">Echo</p>
     </div>
     <div class="navbar-end">
-      <NewEntryModal /> 
+      <NewEntryModal />
     </div>
   </div>
 </template>
 
 <script>
-
-import NewEntryModal from '../components/NewEntryModal.vue'
+  import NewEntryModal from '../components/NewEntryModal.vue'
 
   export default {
     name: 'Navbar',
@@ -24,8 +23,8 @@ import NewEntryModal from '../components/NewEntryModal.vue'
       },
     },
     components: {
-    NewEntryModal,
-  },
+      NewEntryModal,
+    },
   }
 </script>
 

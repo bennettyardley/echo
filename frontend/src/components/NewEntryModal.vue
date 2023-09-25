@@ -13,8 +13,8 @@
               multiple
               taggable
               push-tags
-              :options="allArtists"
-              v-model="artists"
+              :options="newAllArtists"
+              v-model="newArtists"
               placeholder="Who'd You See?"
               class="outline outline-secondary rounded"></v-select>
           </div>
@@ -22,8 +22,8 @@
             <v-select
               taggable
               push-tags
-              :options="allVenues"
-              v-model="venue"
+              :options="newAllVenues"
+              v-model="newVenue"
               placeholder="Where'd You Go?"
               class="outline outline-secondary rounded"></v-select>
           </div>
@@ -31,7 +31,7 @@
             <VueDatePicker
               :enable-time-picker="false"
               position="center"
-              v-model="entryDate"
+              v-model="newEntryDate"
               class="outline outline-secondary rounded"
               dark />
           </div>
@@ -46,26 +46,38 @@
 </template>
 
 <script>
+  import axios from 'axios'
+
   export default {
     name: 'NewEntryModal',
+    data: () => ({
+      newAllArtists: [],
+      newAllVenues: [],
+      newArtists: [],
+      newVenue: '',
+      newEntryDate: new Date(),
+      open: false,
+    }),
     methods: {
       closeModal() {
         this.open = false
       },
-      submit() {
-        let id = 'a'
-        this.$router.push('/entry/' + id)
+      async submit() {
+        const response = await axios.post('http://localhost:4202/entry', {
+          artists: this.newArtists,
+          venue: this.newVenue,
+          date: this.newEntryDate,
+        })
+        this.$router.push('/entry/' + response.data.id)
         this.open = false
       },
     },
-    data: () => ({
-      allArtists: [],
-      allVenues: [],
-      artists: [],
-      venue: '',
-      entryDate: new Date(),
-      open: false,
-    }),
+
+    async beforeMount() {
+      const response = await axios.get('http://localhost:4202/formData')
+      this.newAllArtists = response.data.artists
+      this.newAllVenues = response.data.venues
+    },
   }
 </script>
 
@@ -100,15 +112,5 @@
     --dp-icon-color: #e9e5ff;
     --dp-danger-color: #e53935;
     --dp-highlight-color: rgba(0, 92, 178, 0.2);
-  }
-  .pagination {
-    display: flex;
-    margin: 0.25rem 0.25rem 0;
-  }
-  .pagination button {
-    flex-grow: 1;
-  }
-  .pagination button:hover {
-    cursor: pointer;
   }
 </style>

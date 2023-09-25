@@ -1,9 +1,14 @@
 const express = require('express')
 const { Deta } = require('deta')
 const multer = require('multer')
+const bodyParser = require('body-parser')
+const cors = require('cors')
 
 const app = express()
-const upload = multer({ dest: 'uploads/' })
+app.use(cors())
+app.use(bodyParser.json())
+
+const upload = multer({ dest: './tmp/media/' })
 // eslint-disable-next-line no-undef
 const port = process.env.PORT || 8080
 
@@ -12,7 +17,8 @@ const db = deta.Base('echo')
 
 function d2s(date) {
   const currentDate = new Date()
-  const inputDateTime = date.getTime()
+  const dateObj = new Date(date)
+  const inputDateTime = dateObj.getTime()
   const currentDateTime = currentDate.getTime()
   const timeDifference = currentDateTime - inputDateTime
 
@@ -124,22 +130,19 @@ function calculateTopEntries(entries, artistName, dateRange) {
   return topEntries
 }
 
-app.get('/artists', async (req, res) => {
-  const allEntries = await db.fetch()
-  let artists = []
-  for (let entry in allEntries.items) {
-    artists.concat(entry.artists)
-  }
-  res.json(artists)
-})
+app.options('*', cors())
 
-app.get('/venues', async (req, res) => {
+app.get('/formData', async (req, res) => {
   const allEntries = await db.fetch()
   let venues = []
-  for (let entry in allEntries.items) {
-    venues.push(entry.venue)
+  let artists = []
+  for (let entry of allEntries.items) {
+    if (!venues.includes(entry.venue)) venues.push(entry.venue)
+    for (let artist of entry.artists) {
+      if (!artists.includes(artist)) artists.push(artist)
+    }
   }
-  res.json(venues)
+  res.json({ venues, artists })
 })
 
 app.get('/artist/:artist', async (req, res) => {
@@ -198,6 +201,51 @@ app.post('/upload', upload.array('media'), function (req, res, next) {
   // req.files is array of `photos` files
   // req.body will contain the text fields, if there were any
   console.log(req.files)
+  res.send(200)
+})
+
+app.patch('/entry', async (req, res) => {
+  let update = {}
+  for (let key in req.body) {
+    if (key !== 'id') update[key] = req.body[key]
+  }
+  try {
+    const entry = await db.update(update, req.body.id)
+  } catch (err) {}
+  res.sendStatus(200)
+})
+
+app.post('/entry', async (req, res) => {
+  const entry = await db.put(req.body)
+  res.json({ id: entry.key })
+})
+
+app.get('/entry/:id', async (req, res) => {
+  const entry = await db.get(req.params.id)
+  res.json(entry)
+})
+
+app.get('/entries/:page', async (req, res) => {
+  const allEntries = await db.fetch()
+  const pages = Math.ceil(allEntries.count / 10)
+
+  const start = (req.params.page - 1) * 10
+  const end = Math.min(start + 10, allEntries.count)
+
+  const slicedEntries = allEntries.items.slice(start, end)
+
+  const entries = []
+  for (let entry of slicedEntries) {
+    entries.push({
+      favorite: entry.favorite,
+      artists: entry.artists.join(', '),
+      venue: entry.venue,
+      date: d2s(entry.date),
+      id: entry.key,
+    })
+  }
+
+  res.status(200).json({ pages, entries })
 })
 
 app.listen(port, () => {

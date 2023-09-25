@@ -11,6 +11,7 @@ Features:
    5. Rating
    6. Favorite
    7. Pictures / Videos
+   8. Genre?
 2. Stats
 3. Share (Looks like a ticket)
 4. Calendar View?
