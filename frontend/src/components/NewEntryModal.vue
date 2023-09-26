@@ -69,7 +69,7 @@
         this.open = false
       },
       async submit() {
-        const response = await axios.post('http://localhost:4202/entry', {
+        const response = await axios.post(import.meta.env.VITE_API + '/entry', {
           artists: this.newArtists,
           venue: this.newVenue,
           date: this.newEntryDate,

@@ -5,6 +5,8 @@ import VueDatePicker from '@vuepic/vue-datepicker'
 
 import 'vue-select/dist/vue-select.css'
 import '@vuepic/vue-datepicker/dist/main.css'
+import 'filepond/dist/filepond.min.css'
+import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css'
 
 import App from './App.vue'
 import router from './router'

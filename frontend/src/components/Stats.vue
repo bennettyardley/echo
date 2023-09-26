@@ -31,7 +31,7 @@
       }
     },
     async mounted() {
-      const response = await axios.get('http://localhost:4202/stats')
+      const response = await axios.get(import.meta.env.VITE_API + '/stats')
       this.year = response.data.year
       this.unique = response.data.unique
     },

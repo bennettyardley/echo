@@ -84,7 +84,7 @@
       },
     },
     async beforeMount() {
-      const response = await axios.get('http://localhost:4202/entry/' + this.id)
+      const response = await axios.get(import.meta.env.VITE_API + '/entry/' + this.id)
       this.artists = response.data.artists
       this.entryDate = response.data.date
       this.venue = response.data.venue
@@ -99,7 +99,7 @@
           return
         }
         axios
-          .patch('http://localhost:4202/entry', { id: this.id, comment: value })
+          .patch(import.meta.env.VITE_API + '/entry', { id: this.id, comment: value })
           .then((res) => {})
           .catch((err) => {
             console.log(err)
@@ -111,7 +111,7 @@
           return
         }
         axios
-          .patch('http://localhost:4202/entry', { id: this.id, artists: this.artists, venue: this.venue, date: this.entryDate })
+          .patch(import.meta.env.VITE_API + '/entry', { id: this.id, artists: this.artists, venue: this.venue, date: this.entryDate })
           .then((res) => {})
           .catch((err) => {
             console.log(err)
@@ -119,7 +119,7 @@
       }, 500),
       updateRating(field) {
         axios
-          .patch('http://localhost:4202/entry', { id: this.id, rating: field.target.id })
+          .patch(import.meta.env.VITE_API + '/entry', { id: this.id, rating: field.target.id })
           .then((res) => {})
           .catch((err) => {
             console.log(err)
@@ -127,7 +127,7 @@
       },
       updateFavorite() {
         axios
-          .patch('http://localhost:4202/entry', { id: this.id, favorite: this.favorite })
+          .patch(import.meta.env.VITE_API + '/entry', { id: this.id, favorite: this.favorite })
           .then((res) => {})
           .catch((err) => {
             console.log(err)
@@ -144,7 +144,7 @@
         this.form.addVenue(this.venue)
       },
       async deleteEntry() {
-        await axios.delete('http://localhost:4202/entry/' + this.id)
+        await axios.delete(import.meta.env.VITE_API + '/entry/' + this.id)
         this.$router.push('/')
       },
     },

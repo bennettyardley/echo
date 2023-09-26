@@ -72,7 +72,7 @@
       }
     },
     async beforeMount() {
-      const response = await axios.get('http://localhost:4202/entries/1')
+      const response = await axios.get(import.meta.env.VITE_API + '/entries/1')
       this.table = response.data.entries
       this.pages = response.data.pages
     },
@@ -88,7 +88,7 @@
       },
       updateFavorite(event) {
         axios
-          .patch('http://localhost:4202/entry', { id: event.target.id, favorite: event.target.checked })
+          .patch(import.meta.env.VITE_API + '/entry', { id: event.target.id, favorite: event.target.checked })
           .then((res) => {})
           .catch((err) => {
             console.log(err)
@@ -96,7 +96,7 @@
       },
       async pageTo(n) {
         if (n === this.page) return
-        const response = await axios.get('http://localhost:4202/entries/' + n)
+        const response = await axios.get(import.meta.env.VITE_API + '/entries/' + n)
         this.table = response.data.entries
         this.pages = response.data.pages
         this.page = n

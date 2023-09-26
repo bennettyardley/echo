@@ -1,6 +1,5 @@
 const express = require('express')
 const { Deta } = require('deta')
-const multer = require('multer')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 
@@ -8,7 +7,6 @@ const app = express()
 app.use(cors())
 app.use(bodyParser.json())
 
-const upload = multer({ dest: './tmp/media/' })
 const port = process.env.PORT || 8080
 
 const deta = Deta()
@@ -237,13 +235,6 @@ app.get('/top/:range', async (req, res) => {
   const allEntries = await db.fetch()
   const top = calculateTopArtistsAndVenues(allEntries.items, req.params.range)
   res.sendStatus(200).json(top)
-})
-
-app.post('/upload', upload.array('media'), function (req, res) {
-  // req.files is array of `photos` files
-  // req.body will contain the text fields, if there were any
-  console.log(req.files)
-  res.send(200)
 })
 
 app.patch('/entry', async (req, res) => {

@@ -87,7 +87,7 @@
       Navbar,
     },
     async beforeMount() {
-      const response = await axios.get('http://localhost:4202/artist/' + this.$route.params.artist + '/1')
+      const response = await axios.get(import.meta.env.VITE_API + '/artist/' + this.$route.params.artist + '/1')
       this.table = response.data.entries
       this.pages = response.data.pages
       this.count = response.data.count
@@ -104,7 +104,7 @@
       },
       updateFavorite(event) {
         axios
-          .patch('http://localhost:4202/entry', { id: event.target.id, favorite: event.target.checked })
+          .patch(import.meta.env.VITE_API + '/entry', { id: event.target.id, favorite: event.target.checked })
           .then((res) => {})
           .catch((err) => {
             console.log(err)
@@ -112,7 +112,7 @@
       },
       async pageTo(n) {
         if (n === this.page) return
-        const response = await axios.get('http://localhost:4202/artist/' + this.$route.params.artist + '/' + n)
+        const response = await axios.get(import.meta.env.VITE_API + '/artist/' + this.$route.params.artist + '/' + n)
         this.table = response.data.entries
         this.pages = response.data.pages
         this.page = n

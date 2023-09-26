@@ -8,7 +8,7 @@ export const formStore = defineStore('form', {
   }),
   actions: {
     async refresh() {
-      const response = await axios.get('http://localhost:4202/formData')
+      const response = await axios.get(import.meta.env.VITE_API + '/formData')
       this.allArtists = response.data.artists
       localStorage.setItem('allArtists', JSON.stringify(response.data.artists))
       this.allVenues = response.data.venues
