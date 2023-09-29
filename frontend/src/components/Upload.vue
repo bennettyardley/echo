@@ -10,17 +10,29 @@
       <input class="fileInput" type="file" id="drop" @change="handleFileUpload($event)" @drop="handleFileDrop($event)" multiple />
     </div> -->
 
-    <file-pond name="test" ref="pond" allow-multiple="true" :files="files" class="max-w-xs aspect-square" />
+    <file-pond
+      name="test"
+      ref="pond"
+      instantUpload="false"
+      allow-multiple="true"
+      allowRevert="false"
+      accepted-file-types="image/jpeg, image/png"
+      v-bind:server="myServer"
+      @init="handleFilePondInit"
+      @processfile="handleFilePondProcessfile"
+      @removefile="handleFilePondRemovefile"
+      @addfile="handleOnaddfile" />
 
-    {{ files }}
+    {{ myFiles }}
   </div>
 </template>
 
 <script>
   import vueFilePond from 'vue-filepond'
   import FilePondPluginImagePreview from 'filepond-plugin-image-preview'
+  import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type'
 
-  const FilePond = vueFilePond(FilePondPluginImagePreview)
+  const FilePond = vueFilePond(FilePondPluginImagePreview, FilePondPluginFileValidateType)
 
   export default {
     name: 'Upload',
@@ -29,39 +41,30 @@
     },
     data() {
       return {
-        files: [],
-        progress: 0,
-        num: 0,
+        // fake server to simulate loading a 'local' server file and processing a file
+        myServer: {
+          process: async (fieldName, file, metadata, load) => {
+            await this.uploadFileInChunks(file)
+            load()
+          },
+          load: (source, load) => {
+            return true
+          },
+        },
+        myFiles: [],
       }
     },
 
-    mounted() {
-      ;['drag', 'dragstart', 'dragend', 'dragover', 'dragenter', 'dragleave', 'drop'].forEach(
-        function (evt) {
-          document.getElementById('drop').addEventListener(
-            evt,
-            function (e) {
-              e.preventDefault()
-              e.stopPropagation()
-            }.bind(this),
-            false,
-          )
-        }.bind(this),
-      )
-    },
-
     methods: {
-      handleFileDrop(event) {
-        for (let i = 0; i < event.dataTransfer.files.length; i++) {
-          this.files.push(event.dataTransfer.files[i])
-        }
-        this.submitFiles()
+      handleFilePondInit: function () {},
+
+      handleOnaddfile() {
+        // console.log(this.$refs.pond.getFiles()[0].file)
       },
 
-      handleFileUpload(event) {
-        this.files = event.target.files
-        this.submitFiles()
-      },
+      handleFilePondProcessfile() {},
+
+      handleFilePondRemovefile() {},
 
       submitFiles() {
         for (var i = 0; i < this.files.length; i++) {
@@ -71,97 +74,98 @@
       },
 
       async uploadFileInChunks(file) {
-        this.num++
-        const dataKey = import.meta.env.VITE_DETA
-        const projectId = dataKey.split('_')[0]
-        const headers = { 'X-API-Key': dataKey }
-        const drive = `https://drive.deta.sh/v1/${projectId}/echo`
-        const maxChunkSize = 10 * 1024 * 1024 // 10MB
-        const fileSize = file.size
+        return new Promise(async (resolve, reject) => {
+          const dataKey = import.meta.env.VITE_DETA
+          const projectId = dataKey.split('_')[0]
+          const headers = { 'X-API-Key': dataKey }
+          const drive = `https://drive.deta.sh/v1/${projectId}/echo`
+          const maxChunkSize = 10 * 1024 * 1024 // 10MB
+          const fileSize = file.size
 
-        if (fileSize <= maxChunkSize) {
-          // File is small enough to upload in a single request
-          const formData = new FormData()
-          formData.append('file', file)
+          if (fileSize <= maxChunkSize) {
+            // File is small enough to upload in a single request
+            const formData = new FormData()
+            formData.append('file', file)
 
-          // Upload the file directly
-          await fetch(`${drive}/files?name=${file.name}`, {
-            method: 'POST',
-            body: formData,
-            headers,
-          })
-        } else {
-          // File is larger, initiate chunked upload
-          const initiateUploadResponse = await fetch(`${drive}/uploads?name=${file.name}`, {
-            method: 'POST',
-            headers,
-          })
-          const { upload_id } = await initiateUploadResponse.json()
-
-          // Split the file into chunks
-          let offset = 0
-          let part = 1
-
-          // Array to store promises for each chunk upload
-          const chunkUploadPromises = []
-
-          while (offset < fileSize) {
-            const chunkSize = Math.min(maxChunkSize, fileSize - offset)
-            const chunk = file.slice(offset, offset + chunkSize)
-
-            // Create an XHR object for chunk uploads
-            const xhr = new XMLHttpRequest()
-
-            // Track upload progress for each chunk
-            xhr.upload.addEventListener('progress', (e) => {
-              if (e.lengthComputable) {
-                console.log(e)
-                const percentComplete = (e.loaded / e.total) * 100
-                onProgress(percentComplete)
-              }
+            // Upload the file directly
+            await fetch(`${drive}/files?name=${file.name}`, {
+              method: 'POST',
+              body: formData,
+              headers,
             })
+            resolve(true)
+          } else {
+            // File is larger, initiate chunked upload
+            const initiateUploadResponse = await fetch(`${drive}/uploads?name=${file.name}`, {
+              method: 'POST',
+              headers,
+            })
+            const { upload_id } = await initiateUploadResponse.json()
 
-            // Configure the XHR request for chunk upload
-            xhr.open('POST', `${drive}/uploads/${upload_id}/parts?name=${file.name}&part=${part}`, true)
+            // Split the file into chunks
+            let offset = 0
+            let part = 1
 
-            // Set the appropriate headers for binary data
-            xhr.setRequestHeader('Content-Type', 'application/octet-stream')
-            xhr.setRequestHeader('X-API-Key', dataKey)
+            // Array to store promises for each chunk upload
+            const chunkUploadPromises = []
 
-            // Create a promise for this chunk upload
-            const chunkUploadPromise = new Promise((resolve, reject) => {
-              xhr.onload = () => {
-                if (xhr.status === 200) {
-                  resolve()
-                } else {
-                  reject(`Chunk upload failed with status code: ${xhr.status}`)
+            while (offset < fileSize) {
+              const chunkSize = Math.min(maxChunkSize, fileSize - offset)
+              const chunk = file.slice(offset, offset + chunkSize)
+
+              // Create an XHR object for chunk uploads
+              const xhr = new XMLHttpRequest()
+
+              // Track upload progress for each chunk
+              xhr.upload.addEventListener('progress', (e) => {
+                if (e.lengthComputable) {
+                  const percentComplete = (e.loaded / e.total) * 100
                 }
-              }
+              })
 
-              xhr.onerror = () => {
-                reject('Chunk upload failed due to network error')
-              }
+              // Configure the XHR request for chunk upload
+              xhr.open('POST', `${drive}/uploads/${upload_id}/parts?name=${file.name}&part=${part}`, true)
+
+              // Set the appropriate headers for binary data
+              xhr.setRequestHeader('Content-Type', 'application/octet-stream')
+              xhr.setRequestHeader('X-API-Key', dataKey)
+
+              // Create a promise for this chunk upload
+              const chunkUploadPromise = new Promise((resolve, reject) => {
+                xhr.onload = () => {
+                  if (xhr.status === 200) {
+                    resolve()
+                  } else {
+                    reject(`Chunk upload failed with status code: ${xhr.status}`)
+                  }
+                }
+
+                xhr.onerror = () => {
+                  reject('Chunk upload failed due to network error')
+                }
+              })
+
+              // Send the chunk data directly as a blob
+              xhr.send(chunk)
+
+              // Add the promise to the array
+              chunkUploadPromises.push(chunkUploadPromise)
+
+              offset += chunkSize
+              part++
+            }
+
+            // Wait for all chunk uploads to complete successfully
+            await Promise.all(chunkUploadPromises)
+
+            // Finalize the upload
+            await fetch(`${drive}/uploads/${upload_id}?name=${file.name}`, {
+              method: 'PATCH',
+              headers,
             })
-
-            // Send the chunk data directly as a blob
-            xhr.send(chunk)
-
-            // Add the promise to the array
-            chunkUploadPromises.push(chunkUploadPromise)
-
-            offset += chunkSize
-            part++
+            resolve(true)
           }
-
-          // Wait for all chunk uploads to complete successfully
-          await Promise.all(chunkUploadPromises)
-
-          // Finalize the upload
-          await fetch(`${drive}/uploads/${upload_id}?name=${file.name}`, {
-            method: 'PATCH',
-            headers,
-          })
-        }
+        })
       },
     },
   }
