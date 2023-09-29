@@ -11,6 +11,7 @@ const port = process.env.PORT || 8080
 
 const deta = Deta()
 const db = deta.Base('echo')
+const drive = deta.Drive('echo')
 
 function d2s(date) {
   const currentDate = new Date()
@@ -292,6 +293,17 @@ app.get('/entries/:page', async (req, res) => {
 app.delete('/entry/:id', async (req, res) => {
   await db.delete(req.params.id)
   res.sendStatus(200)
+})
+
+app.get('/image/:name', async (req, res) => {
+  res.sendStatus(200)
+  // const blob = await drive.get(req.params.name)
+  // console.log(blob)
+  // res.writeHead(200, {
+  //   'Content-Type': 'image/png',
+  //   'Content-Length': blob.size,
+  // })
+  // res.end(blob)
 })
 
 app.listen(port, () => {

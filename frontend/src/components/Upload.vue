@@ -10,6 +10,8 @@
       <input class="fileInput" type="file" id="drop" @change="handleFileUpload($event)" @drop="handleFileDrop($event)" multiple />
     </div> -->
 
+    <img src="http://localhost:4202/image/IMG_5069.png" />
+
     <file-pond
       name="test"
       ref="pond"
@@ -18,12 +20,7 @@
       allowRevert="false"
       accepted-file-types="image/jpeg, image/png"
       v-bind:server="myServer"
-      @init="handleFilePondInit"
-      @processfile="handleFilePondProcessfile"
-      @removefile="handleFilePondRemovefile"
-      @addfile="handleOnaddfile" />
-
-    {{ myFiles }}
+      @init="handleFilePondInit" />
   </div>
 </template>
 
@@ -41,7 +38,6 @@
     },
     data() {
       return {
-        // fake server to simulate loading a 'local' server file and processing a file
         myServer: {
           process: async (fieldName, file, metadata, load) => {
             await this.uploadFileInChunks(file)
@@ -58,21 +54,6 @@
     methods: {
       handleFilePondInit: function () {},
 
-      handleOnaddfile() {
-        // console.log(this.$refs.pond.getFiles()[0].file)
-      },
-
-      handleFilePondProcessfile() {},
-
-      handleFilePondRemovefile() {},
-
-      submitFiles() {
-        for (var i = 0; i < this.files.length; i++) {
-          let file = this.files[i]
-          this.uploadFileInChunks(file)
-        }
-      },
-
       async uploadFileInChunks(file) {
         return new Promise(async (resolve, reject) => {
           const dataKey = import.meta.env.VITE_DETA
@@ -87,7 +68,7 @@
             const formData = new FormData()
             formData.append('file', file)
 
-            // Upload the file directly
+            // Upload the file directly <--- THIS DOESN'T WORK NEEDS TO SEND AS PLAIN DATA NOT FORM
             await fetch(`${drive}/files?name=${file.name}`, {
               method: 'POST',
               body: formData,
