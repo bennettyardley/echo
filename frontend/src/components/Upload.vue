@@ -65,14 +65,16 @@
 
           if (fileSize <= maxChunkSize) {
             // File is small enough to upload in a single request
-            const formData = new FormData()
-            formData.append('file', file)
+            const fileBlob = file.slice(0) // Create a Blob from the entire file
 
-            // Upload the file directly <--- THIS DOESN'T WORK NEEDS TO SEND AS PLAIN DATA NOT FORM
+            // Upload the file directly as plain data
             await fetch(`${drive}/files?name=${file.name}`, {
               method: 'POST',
-              body: formData,
-              headers,
+              body: fileBlob,
+              headers: {
+                ...headers,
+                'Content-Type': 'application/octet-stream', // Set the content type to octet-stream
+              },
             })
             resolve(true)
           } else {

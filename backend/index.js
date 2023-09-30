@@ -136,6 +136,22 @@ function calculateTopArtistsAndVenues(entries, dateRange) {
   }
 }
 
+function getContentType(fileName) {
+  const extension = fileName.split('.').pop()
+  switch (extension) {
+    case 'png':
+      return 'image/png'
+    case 'jpg':
+    case 'jpeg':
+      return 'image/jpeg'
+    case 'gif':
+      return 'image/gif'
+    // Add more cases as needed for other image formats
+    default:
+      return 'application/octet-stream' // Default to binary data
+  }
+}
+
 app.options('*', cors())
 
 app.get('/formData', async (req, res) => {
@@ -296,14 +312,15 @@ app.delete('/entry/:id', async (req, res) => {
 })
 
 app.get('/image/:name', async (req, res) => {
-  res.sendStatus(200)
-  // const blob = await drive.get(req.params.name)
-  // console.log(blob)
-  // res.writeHead(200, {
-  //   'Content-Type': 'image/png',
-  //   'Content-Length': blob.size,
-  // })
-  // res.end(blob)
+  const blob = await drive.get(req.params.name)
+  const contentType = getContentType(req.params.name)
+
+  const buffer = await blob.arrayBuffer()
+  console.log(buffer)
+
+  res.setHeader('Content-Type', contentType)
+  res.setHeader('Content-Length', blob.size.toString())
+  res.send(Buffer.from(buffer))
 })
 
 app.listen(port, () => {

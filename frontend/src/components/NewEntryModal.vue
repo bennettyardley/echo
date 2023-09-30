@@ -6,8 +6,8 @@
       <div class="modal-box flex max-w-none w-3/5 h-3/4 justify-center">
         <form method="dialog" class="text-center w-3/5">
           <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeModal">✕</button>
-          <h3 class="font-bold text-xl mt-6">Had Fun? Log your concert:</h3>
-          <div class="mt-6">
+          <h3 class="font-bold text-xl mt-5">Had Fun? Log your concert:</h3>
+          <div class="mt-5">
             <v-select
               multiple
               taggable
@@ -17,7 +17,7 @@
               placeholder="Who'd You See?"
               class="outline outline-secondary rounded"></v-select>
           </div>
-          <div class="mt-6">
+          <div class="mt-5">
             <v-select
               taggable
               :options="form.allVenues"
@@ -26,7 +26,7 @@
               placeholder="Where'd You Go?"
               class="outline outline-secondary rounded"></v-select>
           </div>
-          <div class="mt-6">
+          <div class="mt-5">
             <VueDatePicker
               :enable-time-picker="false"
               position="center"
@@ -34,7 +34,7 @@
               class="outline outline-secondary rounded"
               dark />
           </div>
-          <div class="mt-40">
+          <div class="absolute inset-x-0 bottom-5">
             <button class="btn btn-primary" @click="submit">ADD New Entry</button>
           </div>
         </form>
