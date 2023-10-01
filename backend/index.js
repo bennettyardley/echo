@@ -7,10 +7,13 @@ const app = express()
 app.use(cors())
 app.use(bodyParser.json())
 
+app.options('*', cors())
+
 const port = process.env.PORT || 8080
 
 const deta = Deta()
 const db = deta.Base('echo')
+const db2 = deta.Base('artists')
 const drive = deta.Drive('echo')
 
 function d2s(date) {
@@ -152,8 +155,6 @@ function getContentType(fileName) {
   }
 }
 
-app.options('*', cors())
-
 app.get('/formData', async (req, res) => {
   const allEntries = await db.fetch()
   let venues = []
@@ -182,7 +183,8 @@ app.get('/artist/:artist/:page', async (req, res) => {
 
   const slicedEntries = allEntries.items.slice(start, end)
 
-  const entries = []
+  let entries = []
+  let media = []
   for (let entry of slicedEntries) {
     entries.push({
       favorite: entry.favorite,
@@ -191,9 +193,14 @@ app.get('/artist/:artist/:page', async (req, res) => {
       date: d2s(entry.date),
       id: entry.key,
     })
+    if (entry.media) {
+      for (let img of entry.media) {
+        if (!media.includes(img)) media.push(img)
+      }
+    }
   }
 
-  res.status(200).json({ pages, entries, count: allEntries.count })
+  res.status(200).json({ pages, entries, media, count: allEntries.count })
 })
 
 app.get('/venue/:venue/:page', async (req, res) => {
@@ -211,7 +218,8 @@ app.get('/venue/:venue/:page', async (req, res) => {
 
   const slicedEntries = allEntries.items.slice(start, end)
 
-  const entries = []
+  let entries = []
+  let media = []
   for (let entry of slicedEntries) {
     entries.push({
       favorite: entry.favorite,
@@ -220,9 +228,14 @@ app.get('/venue/:venue/:page', async (req, res) => {
       date: d2s(entry.date),
       id: entry.key,
     })
+    if (entry.media) {
+      for (let img of entry.media) {
+        if (!media.includes(img)) media.push(img)
+      }
+    }
   }
 
-  res.status(200).json({ pages, entries, count: allEntries.count })
+  res.status(200).json({ pages, entries, media, count: allEntries.count })
 })
 
 app.get('/stats', async (req, res) => {
@@ -239,7 +252,6 @@ app.get('/stats', async (req, res) => {
     },
     unique: {
       num: `${stats.unique}`,
-
       pct:
         stats.uniquePercent > 0
           ? `${Math.floor(stats.uniquePercent)}% more than last year`
@@ -261,6 +273,48 @@ app.patch('/entry', async (req, res) => {
   }
   try {
     await db.update(update, req.body.id)
+  } catch (err) {
+    console.log(err)
+  }
+  res.sendStatus(200)
+})
+
+app.put('/artist', async (req, res) => {
+  for (let artist of req.body.artists) {
+    try {
+      const entry = await db2.get(artist)
+      let update = entry.media || []
+      if (!update.includes(req.body.media)) update.push(req.body.media)
+      try {
+        await db2.update({ media: update }, artist)
+      } catch (err) {
+        console.log(err)
+      }
+    } catch (err) {
+      await db2.put({ media: [req.body.media] }, artist)
+    }
+  }
+  res.sendStatus(200)
+})
+
+app.put('/media', async (req, res) => {
+  const entry = await db.get(req.body.id)
+  let update = entry.media || []
+  if (!update.includes(req.body.media)) update.push(req.body.media)
+  try {
+    await db.update({ media: update }, req.body.id)
+  } catch (err) {
+    console.log(err)
+  }
+  res.sendStatus(200)
+})
+
+app.patch('/media', async (req, res) => {
+  const entry = await db.get(req.body.id)
+  let update = entry.media || []
+  if (update.includes(req.body.media)) update = update.filter((item) => item !== req.body.media)
+  try {
+    await db.update({ media: update }, req.body.id)
   } catch (err) {
     console.log(err)
   }
@@ -316,7 +370,6 @@ app.get('/image/:name', async (req, res) => {
   const contentType = getContentType(req.params.name)
 
   const buffer = await blob.arrayBuffer()
-  console.log(buffer)
 
   res.setHeader('Content-Type', contentType)
   res.setHeader('Content-Length', blob.size.toString())

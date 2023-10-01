@@ -1,19 +1,7 @@
 <template>
   <div>
-    <!-- <div class="card max-w-xs bg-primary aspect-square overflow-hidden">
-      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" class="mx-auto my-auto text-2xl" viewBox="0 0 16 16">
-        <path
-          d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
-        <path
-          d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z" />
-      </svg>
-      <input class="fileInput" type="file" id="drop" @change="handleFileUpload($event)" @drop="handleFileDrop($event)" multiple />
-    </div> -->
-
-    <img src="http://localhost:4202/image/IMG_5069.png" />
-
     <file-pond
-      name="test"
+      name="uploader"
       ref="pond"
       instantUpload="false"
       allow-multiple="true"
@@ -21,11 +9,41 @@
       accepted-file-types="image/jpeg, image/png"
       v-bind:server="myServer"
       @init="handleFilePondInit" />
+
+    <input type="checkbox" v-model="artistModal" id="artistModal" class="modal-toggle" />
+    <div class="modal">
+      <div class="modal-box flex flex-col justify-between max-w-none w-5/12 h-3/4">
+        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeArtistModal">✕</button>
+
+        <!-- Prompt -->
+        <p class="text-center mt-4">Heads Up! This event had multiple artists, was that picture of a specific artist?</p>
+
+        <!-- Centered artist list with Select All button -->
+        <div class="flex flex-col mx-auto">
+          <!-- Select All button -->
+          <button class="btn btn-outline btn-primary mb-2" @click="selectAllArtists">All</button>
+
+          <!-- Checkbox options for artists -->
+          <div v-for="(artist, index) in artists" :key="index" class="flex items-center">
+            <input type="checkbox" :id="'artist_' + index" v-model="selectedArtists" :value="artist" class="mr-2" />
+            <label :for="'artist_' + index">{{ artist }}</label>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex justify-end mt-4">
+          <!-- <button class="btn btn-outline mr-3" @click="closeArtistModal">Cancel</button> -->
+          <button class="btn btn-success" @click="assignArtists">Assign</button>
+        </div>
+      </div>
+      <label class="modal-backdrop" for="artistModal">Close</label>
+    </div>
   </div>
 </template>
 
 <script>
   import vueFilePond from 'vue-filepond'
+  import axios from 'axios'
   import FilePondPluginImagePreview from 'filepond-plugin-image-preview'
   import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type'
 
@@ -36,11 +54,17 @@
     components: {
       FilePond,
     },
+    props: ['id', 'artists'],
     data() {
       return {
         myServer: {
           process: async (fieldName, file, metadata, load) => {
             await this.uploadFileInChunks(file)
+            if (this.artists.length > 1) {
+              this.artistModal = true
+              await this.addMedia(file.name)
+            } else await this.addMedia(file.name)
+            this.$emit('addedMedia', file.name)
             load()
           },
           load: (source, load) => {
@@ -48,11 +72,54 @@
           },
         },
         myFiles: [],
+        artistModal: false,
+        selectedArtists: [],
       }
     },
 
     methods: {
       handleFilePondInit: function () {},
+
+      closeArtistModal() {
+        this.artistModal = false
+      },
+
+      addMedia(name) {
+        return new Promise(async (resolve, reject) => {
+          await axios
+            .put(import.meta.env.VITE_API + '/media', { id: this.id, media: name })
+            .then((res) => {
+              resolve(true)
+            })
+            .catch((err) => {
+              console.log(err)
+              reject(false)
+            })
+        })
+      },
+      //name is undefined we need to set and unset a file.name var
+      artistMedia(name) {
+        return new Promise(async (resolve, reject) => {
+          await axios
+            .put(import.meta.env.VITE_API + '/artist', { artists: this.selectedArtists, media: name })
+            .then((res) => {
+              resolve(true)
+            })
+            .catch((err) => {
+              console.log(err)
+              reject(false)
+            })
+        })
+      },
+
+      selectAllArtists() {
+        this.selectedArtists = [...this.artists]
+      },
+
+      async assignArtists() {
+        await this.artistMedia()
+        this.artistModal = false
+      },
 
       async uploadFileInChunks(file) {
         return new Promise(async (resolve, reject) => {

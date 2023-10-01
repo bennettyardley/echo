@@ -14,7 +14,7 @@
       </div>
     </div>
     <div class="grid grid-rows-2 grid-cols-4 gap-2 pt-8">
-      <div class="mask mask- col-span-2 row-span-2 aspect-square overflow-hidden relative rounded-3xl">
+      <div class="col-span-2 row-span-2 aspect-square overflow-hidden relative rounded-3xl">
         <a @click="toArtist" class="link">
           <img src="../assets/IMG_5069.png" />
           <figcaption class="absolute px-7 text-center text-lg text-white top-5">Lorem1</figcaption>

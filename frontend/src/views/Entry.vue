@@ -64,13 +64,50 @@
           <Share class="" />
         </div>
         <div class="mt-5">
-          <button @click="deleteEntry" class="btn btn-error">Delete</button>
+          <label for="deleteModal" class="btn btn-error">Delete</label>
         </div>
       </div>
 
       <!-- Upload -->
-      <div class="w-full mt-5">
-        <Upload class="w-full" />
+      <div class="w-full mt-5 mb-20">
+        <Upload :id="id" :artists="artists" @addedMedia="newMedia" />
+        <div class="flex space-x-2 overflow-x-auto mt-2">
+          <div v-for="img in media" :key="img" class="relative group">
+            <div class="relative inline-block group-hover">
+              <img :src="url + '/image/' + img" class="max-w-xs max-h-xs bg-100 rounded" />
+              <button
+                @click="deleteImage(img)"
+                class="absolute top-2 right-2 p-1 btn btn-error btn-circle opacity-0 transition-opacity group-hover:opacity-100 focus:outline-none">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  fill="currentColor"
+                  class="bi bi-trash3-fill"
+                  viewBox="0 0 16 16">
+                  <path
+                    d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Delete Modal -->
+      <input type="checkbox" v-model="deleteOpen" id="deleteModal" class="modal-toggle" />
+      <div class="modal">
+        <div class="modal-box flex flex-col justify-between max-w-none w-1/5 h-1/4">
+          <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeDeleteModal">✕</button>
+          <div>
+            <p class="text-center mt-2">Are you sure you want to delete?</p>
+          </div>
+          <div class="flex justify-between mt-4">
+            <button class="btn btn-outline" @click="closeDeleteModal">No</button>
+            <button class="btn btn-error" @click="deleteEntry">Yes</button>
+          </div>
+        </div>
+        <label class="modal-backdrop" for="deleteModal">Close</label>
       </div>
     </div>
   </div>
@@ -105,10 +142,12 @@
         comment: '',
         rating: 1,
         media: [],
+        url: import.meta.env.VITE_API,
         rate: { 1: false, 2: false, 3: false, 4: false, 5: false },
         id: this.$route.params.id,
         first: true,
         second: true,
+        deleteOpen: false,
       }
     },
     watch: {
@@ -132,6 +171,7 @@
       this.venue = response.data.venue
       this.favorite = response.data.favorite
       this.comment = response.data.comment
+      this.media = response.data.media
       this.rate[response.data.rating] = true
     },
     methods: {
@@ -187,7 +227,25 @@
       },
       async deleteEntry() {
         await axios.delete(import.meta.env.VITE_API + '/entry/' + this.id)
+        this.deleteOpen = false
         this.$router.push('/')
+      },
+      newMedia(value) {
+        if (this.media) {
+          if (!this.media.includes(value)) this.media.push(value)
+        } else this.media = [value]
+      },
+      async deleteImage(name) {
+        await axios
+          .patch(import.meta.env.VITE_API + '/media', { id: this.id, media: name })
+          .then((res) => {})
+          .catch((err) => {
+            console.log(err)
+          })
+        this.media = this.media.filter((item) => item !== name)
+      },
+      closeDeleteModal() {
+        this.deleteOpen = false
       },
     },
   }

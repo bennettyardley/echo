@@ -8,7 +8,7 @@
           <div class="stat-value">{{ count }}</div>
         </div>
       </div>
-      <div class="card mt-4 card-bordered overflow-hidden">
+      <div class="card mt-5 card-bordered overflow-hidden">
         <table v-if="table.length === 0" class="table">
           <tbody>
             <tr class="hover:bg-secondary hover:text-primary-content">
@@ -64,6 +64,15 @@
           </button>
         </div>
       </div>
+      <div class="mt-5 mb-20">
+        <div class="flex space-x-2 overflow-x-auto mt-2">
+          <div v-for="img in media" :key="img" class="relative group">
+            <div class="relative inline-block group-hover">
+              <img :src="url + '/image/' + img" class="max-w-xs max-h-xs bg-100 rounded" />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -81,6 +90,8 @@
         page: 1,
         pages: 1,
         count: 1,
+        media: [],
+        url: import.meta.env.VITE_API,
       }
     },
     components: {
@@ -91,6 +102,7 @@
       this.table = response.data.entries
       this.pages = response.data.pages
       this.count = response.data.count
+      this.media = response.data.media
     },
     methods: {
       peek(into, type, link) {
