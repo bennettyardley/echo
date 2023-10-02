@@ -1,5 +1,5 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
+  import { RouterLink, RouterView } from 'vue-router'
 </script>
 
 <template>
@@ -7,8 +7,8 @@ import { RouterLink, RouterView } from 'vue-router'
 </template>
 
 <style>
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-@tailwind variants;
+  @tailwind base;
+  @tailwind components;
+  @tailwind utilities;
+  @tailwind variants;
 </style>

@@ -61,6 +61,7 @@
           process: async (fieldName, file, metadata, load) => {
             await this.uploadFileInChunks(file)
             if (this.artists.length > 1) {
+              this.fileName = file.name
               this.artistModal = true
               await this.addMedia(file.name)
             } else await this.addMedia(file.name)
@@ -74,6 +75,7 @@
         myFiles: [],
         artistModal: false,
         selectedArtists: [],
+        fileName: '',
       }
     },
 
@@ -98,11 +100,12 @@
         })
       },
       //name is undefined we need to set and unset a file.name var
-      artistMedia(name) {
+      artistMedia() {
         return new Promise(async (resolve, reject) => {
           await axios
-            .put(import.meta.env.VITE_API + '/artist', { artists: this.selectedArtists, media: name })
+            .put(import.meta.env.VITE_API + '/artist', { artists: this.selectedArtists, media: this.fileName })
             .then((res) => {
+              this.fileName = ''
               resolve(true)
             })
             .catch((err) => {

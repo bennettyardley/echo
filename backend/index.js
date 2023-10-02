@@ -91,13 +91,15 @@ function yearStats(entries) {
   }
 }
 
-function calculateTopArtistsAndVenues(entries, dateRange) {
+function calculateTopArtistsAndVenues(entries, artists, dateRange) {
+  // Define time intervals
   const oneYear = 365 * 24 * 60 * 60 * 1000
   const oneDecade = 10 * oneYear
 
+  // Filter entries based on the selected date range
+  const currentDate = new Date()
   const filteredEntries = entries.filter((entry) => {
     const entryDate = new Date(entry.date)
-    const currentDate = new Date()
 
     switch (dateRange) {
       case 'allTime':
@@ -111,8 +113,10 @@ function calculateTopArtistsAndVenues(entries, dateRange) {
     }
   })
 
+  // Count artists and venues occurrences
   const artistCount = {}
   const venueCount = {}
+  const venueMediaMap = {} // Map to store media associated with venues
 
   filteredEntries.forEach((entry) => {
     entry.artists.forEach((artist) => {
@@ -121,22 +125,45 @@ function calculateTopArtistsAndVenues(entries, dateRange) {
 
     const venue = entry.venue
     venueCount[venue] = (venueCount[venue] || 0) + 1
+
+    // Store media associated with venues
+    if (entry.media && entry.media.length > 0 && !venueMediaMap[venue]) {
+      venueMediaMap[venue] = entry.media[0]
+    }
   })
 
-  const topArtists = Object.entries(artistCount)
+  // Sort artists and venues by count in descending order
+  const sortedArtists = Object.entries(artistCount)
     .map(([artist, count]) => ({ artist, count }))
     .sort((a, b) => b.count - a.count)
     .slice(0, 5)
 
-  const topVenues = Object.entries(venueCount)
+  const sortedVenues = Object.entries(venueCount)
     .map(([venue, count]) => ({ venue, count }))
     .sort((a, b) => b.count - a.count)
     .slice(0, 5)
 
-  return {
-    topArtists,
-    topVenues,
-  }
+  // Match artists and venues to their media
+  const topArtistMedia = sortedArtists.map((entry) => {
+    const artist = entry.artist
+    const matchingArtist = artists.find((a) => a.key === artist)
+    return {
+      artist,
+      count: entry.count,
+      media: matchingArtist ? (matchingArtist.media ? matchingArtist.media[0] || '' : '') : '',
+    }
+  })
+
+  const topVenueMedia = sortedVenues.map((entry) => {
+    const venue = entry.venue
+    return {
+      venue,
+      count: entry.count,
+      media: venueMediaMap[venue] || '',
+    }
+  })
+
+  return { topArtistMedia, topVenueMedia }
 }
 
 function getContentType(fileName) {
@@ -170,6 +197,7 @@ app.get('/formData', async (req, res) => {
 
 app.get('/artist/:artist/:page', async (req, res) => {
   const allEntries = await db.fetch({ 'artists?contains': req.params.artist })
+  const dbMedia = await db2.get(req.params.artist)
   const pages = Math.ceil(allEntries.count / 10)
 
   const start = (req.params.page - 1) * 10
@@ -184,7 +212,6 @@ app.get('/artist/:artist/:page', async (req, res) => {
   const slicedEntries = allEntries.items.slice(start, end)
 
   let entries = []
-  let media = []
   for (let entry of slicedEntries) {
     entries.push({
       favorite: entry.favorite,
@@ -193,11 +220,11 @@ app.get('/artist/:artist/:page', async (req, res) => {
       date: d2s(entry.date),
       id: entry.key,
     })
-    if (entry.media) {
-      for (let img of entry.media) {
-        if (!media.includes(img)) media.push(img)
-      }
-    }
+  }
+
+  let media = []
+  if (dbMedia) {
+    if (dbMedia.media) media = dbMedia.media
   }
 
   res.status(200).json({ pages, entries, media, count: allEntries.count })
@@ -262,8 +289,9 @@ app.get('/stats', async (req, res) => {
 
 app.get('/top/:range', async (req, res) => {
   const allEntries = await db.fetch()
-  const top = calculateTopArtistsAndVenues(allEntries.items, req.params.range)
-  res.sendStatus(200).json(top)
+  const allArtists = await db2.fetch()
+  const { topArtistMedia, topVenueMedia } = calculateTopArtistsAndVenues(allEntries.items, allArtists.items, 'allTime')
+  res.status(200).json({ artists: topArtistMedia, venues: topVenueMedia })
 })
 
 app.patch('/entry', async (req, res) => {

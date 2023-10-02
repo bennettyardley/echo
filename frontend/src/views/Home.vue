@@ -5,7 +5,6 @@
       <Stats class="py-4" />
       <Entries class="py-4" />
       <Artists class="py-4" />
-      <Venues class="py-4" />
     </div>
   </div>
 </template>
@@ -15,7 +14,6 @@
   import Entries from '../components/Entries.vue'
   import Stats from '../components/Stats.vue'
   import Artists from '../components/Artists.vue'
-  import Venues from '../components/Venues.vue'
 
   export default {
     components: {
@@ -23,7 +21,6 @@
       Entries,
       Stats,
       Artists,
-      Venues,
     },
   }
 </script>

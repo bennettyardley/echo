@@ -97,15 +97,21 @@
     components: {
       Navbar,
     },
+    watch: {
+      $route: 'getData',
+    },
     async beforeMount() {
-      const response = await axios.get(import.meta.env.VITE_API + '/artist/' + this.$route.params.artist + '/1')
-      this.table = response.data.entries
-      this.pages = response.data.pages
-      this.count = response.data.count
-      this.media = response.data.media
+      await this.getData()
     },
     methods: {
-      peek(into, type, link) {
+      async getData() {
+        const response = await axios.get(import.meta.env.VITE_API + '/artist/' + this.$route.params.artist + '/1')
+        this.table = response.data.entries
+        this.pages = response.data.pages
+        this.count = response.data.count
+        this.media = response.data.media
+      },
+      async peek(into, type, link) {
         if (into.target.nodeName && into.target.nodeName.toLowerCase() === 'td') this.$router.push('/entry/' + link)
         else if (into.target.nodeName && into.target.nodeName.toLowerCase() === 'div' && into.target.className !== 'swap-on')
           this.$router.push('/entry/' + link)
