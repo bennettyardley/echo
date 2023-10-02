@@ -346,6 +346,18 @@ app.patch('/media', async (req, res) => {
   } catch (err) {
     console.log(err)
   }
+  for (let artist of req.body.artists) {
+    try {
+      const artistEntry = await db2.get(artist)
+      let update = artistEntry.media || []
+      if (update.includes(req.body.media)) {
+        update = update.filter((item) => item !== req.body.media)
+        await db2.update({ media: update }, artist)
+      }
+    } catch (err) {
+      continue
+    }
+  }
   res.sendStatus(200)
 })
 

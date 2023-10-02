@@ -64,7 +64,10 @@
               this.fileName = file.name
               this.artistModal = true
               await this.addMedia(file.name)
-            } else await this.addMedia(file.name)
+            } else {
+              await this.addMedia(file.name)
+              this.oneArtistMedia(file.name)
+            }
             this.$emit('addedMedia', file.name)
             load()
           },
@@ -99,7 +102,7 @@
             })
         })
       },
-      //name is undefined we need to set and unset a file.name var
+
       artistMedia() {
         return new Promise(async (resolve, reject) => {
           await axios
@@ -113,6 +116,18 @@
               reject(false)
             })
         })
+      },
+
+      oneArtistMedia(name) {
+        axios
+          .put(import.meta.env.VITE_API + '/artist', { artists: this.artists, media: name })
+          .then((res) => {
+            resolve(true)
+          })
+          .catch((err) => {
+            console.log(err)
+            reject(false)
+          })
       },
 
       selectAllArtists() {

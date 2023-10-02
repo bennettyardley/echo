@@ -237,7 +237,7 @@
       },
       async deleteImage(name) {
         await axios
-          .patch(import.meta.env.VITE_API + '/media', { id: this.id, media: name })
+          .patch(import.meta.env.VITE_API + '/media', { id: this.id, media: name, artists: this.artists })
           .then((res) => {})
           .catch((err) => {
             console.log(err)

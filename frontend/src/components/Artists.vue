@@ -16,14 +16,14 @@
     <div class="grid grid-rows-2 grid-cols-4 gap-2 pt-8">
       <div class="col-span-2 row-span-2 aspect-square overflow-hidden relative rounded-3xl">
         <a @click="toArtist(artists[0].artist)" class="link">
-          <img :src="url + '/image/' + artists[0].media" />
+          <img :src="artists[0].media" />
           <figcaption class="absolute px-7 text-center text-lg text-white top-5">{{ artists[0].artist }}</figcaption>
           <figcaption class="absolute px-7 text-center text-sm text-white top-12">{{ artists[0].count }} Times</figcaption>
         </a>
       </div>
       <div v-for="i of [...Array(4).keys()]" :key="i" class="aspect-square overflow-hidden relative rounded-3xl">
         <a @click="toArtist(artists[i + 1].artist)" class="link">
-          <img :src="url + '/image/' + artists[i + 1].media" />
+          <img :src="artists[i + 1].media" />
           <figcaption class="absolute px-4 text-center text-sm text-white top-5">{{ artists[i + 1].artist }}</figcaption>
           <figcaption class="absolute px-4 text-center text-xs text-white top-10">{{ artists[i + 1].count }} Times</figcaption>
         </a>
@@ -45,14 +45,14 @@
     <div class="grid grid-rows-2 grid-cols-4 gap-2 pt-8">
       <div class="col-span-2 row-span-2 aspect-square overflow-hidden relative rounded-3xl">
         <a @click="toVenue(venues[0].venue)" class="link">
-          <img :src="url + '/image/' + venues[0].media" />
+          <img :src="venues[0].media" />
           <figcaption class="absolute px-7 text-center text-lg text-white top-5">{{ venues[0].venue }}</figcaption>
           <figcaption class="absolute px-7 text-center text-sm text-white top-12">{{ venues[0].count }} Times</figcaption>
         </a>
       </div>
       <div v-for="i of [...Array(4).keys()]" :key="i" class="aspect-square overflow-hidden relative rounded-3xl">
         <a @click="toVenue(venues[i + 1].venue)" class="link">
-          <img :src="url + '/image/' + venues[i + 1].media" />
+          <img :src="venues[i + 1].media" />
           <figcaption class="absolute px-4 text-center text-sm text-white top-5">{{ venues[i + 1].venue }}</figcaption>
           <figcaption class="absolute px-4 text-center text-xs text-white top-10">{{ venues[i + 1].count }} Times</figcaption>
         </a>
@@ -63,20 +63,14 @@
 
 <script>
   import axios from 'axios'
+  const defaultImg = new URL('../assets/Echo_Transparent.png', import.meta.url)
+
   export default {
     name: 'Artists',
     data() {
       return {
-        artists: Array(5).fill({
-          artist: 'None Yet',
-          count: 0,
-          media: 'IMG_5069.png',
-        }),
-        venues: Array(5).fill({
-          venue: 'None Yet',
-          count: 0,
-          media: 'IMG_5069.png',
-        }),
+        artists: Array(5).fill({}),
+        venues: Array(5).fill({}),
         rangeArtist: ['allTime', 'lastYear', 'lastDecade'],
         rangeVenue: ['allTime', 'lastYear', 'lastDecade'],
         url: import.meta.env.VITE_API,
@@ -94,23 +88,35 @@
       const response = await axios.get(import.meta.env.VITE_API + '/top/allTime')
 
       for (let i of [...Array(5).keys()]) {
-        this.artists[i] = response.data.artists[i]
-          ? response.data.artists[i]
-          : {
-              artist: 'None Yet',
-              count: 0,
-              media: 'IMG_5069.png',
-            }
-        this.venues[i] = response.data.venues[i]
-          ? response.data.venues[i]
-          : {
-              venue: 'None Yet',
-              count: 0,
-              media: 'IMG_5069.png',
-            }
+        if (response.data.artists[i]) {
+          let artist = response.data.artists[i]
+          this.artists[i] = {
+            artist: artist.artist,
+            count: artist.count,
+            media: artist.media === '' ? defaultImg : this.url + '/image/' + artist.media,
+          }
+        } else {
+          this.artists[i] = {
+            venue: 'None Yet',
+            count: 0,
+            media: defaultImg,
+          }
+        }
 
-        if (this.artists[i].media === '') this.artists.media = 'IMG_5069.png'
-        if (this.venues[i].media === '') this.venues.media = 'IMG_5069.png'
+        if (response.data.venues[i]) {
+          let venue = response.data.venues[i]
+          this.venues[i] = {
+            venue: venue.venue,
+            count: venue.count,
+            media: venue.media === '' ? defaultImg : this.url + '/image/' + venue.media,
+          }
+        } else {
+          this.venues[i] = {
+            venue: 'None Yet',
+            count: 0,
+            media: defaultImg,
+          }
+        }
       }
     },
   }
