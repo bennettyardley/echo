@@ -173,6 +173,7 @@
       this.comment = response.data.comment
       this.media = response.data.media
       this.rate[response.data.rating] = true
+      await this.form.refresh()
     },
     methods: {
       updateComment: _debounce(function (value) {

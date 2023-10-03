@@ -290,7 +290,7 @@ app.get('/stats', async (req, res) => {
 app.get('/top/:range', async (req, res) => {
   const allEntries = await db.fetch()
   const allArtists = await db2.fetch()
-  const { topArtistMedia, topVenueMedia } = calculateTopArtistsAndVenues(allEntries.items, allArtists.items, 'allTime')
+  const { topArtistMedia, topVenueMedia } = calculateTopArtistsAndVenues(allEntries.items, allArtists.items, req.params.range)
   res.status(200).json({ artists: topArtistMedia, venues: topVenueMedia })
 })
 

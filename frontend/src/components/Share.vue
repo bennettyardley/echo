@@ -6,14 +6,14 @@
       ref="contentToCapture"
       class="bg-secondary rounded-3xl overflow-hidden"
       style="width: 800px; height: 1200px; position: absolute; left: -9999px">
-      <!-- <div ref="contentToCapture" class="bg-secondary rounded-3xl px-2 overflow-hidden" style="width: 800px; height: 1200px"> -->
+      <!-- <div ref="contentToCapture" class="bg-secondary rounded-3xl overflow-hidden" style="width: 800px; height: 1200px"> -->
       <div class="px-2" style="height: 400px">
         <p class="text-8xl uppercase font-bold">{{ venue }}</p>
         <p class="text-3xl">presents</p>
         <p class="text-5xl mt-5">{{ artists.join(', ') }}</p>
       </div>
       <div class="overflow-hidden" style="height: 400px">
-        <img style="margin-top: -200px" :src="img" />
+        <img class="object-cover w-full h-full" :src="img" />
       </div>
       <div class="flex flex-col px-2" style="height: 400px">
         <div class="flex flex-row h-full">
@@ -30,7 +30,7 @@
 
 <script>
   import html2canvas from 'html2canvas'
-  const defaultImg = new URL('../assets/Echo_Transparent.png', import.meta.url)
+  const defaultImg = new URL('../assets/missingVenue.jpg', import.meta.url)
 
   export default {
     data() {
@@ -45,10 +45,13 @@
       date(to) {
         this.dateStr = new Date(to).toDateString()
       },
-      media(to) {
-        if (to.length > 0) {
-          this.img = this.url + '/image/' + to[0]
-        } else this.img = defaultImg
+      media: {
+        handler: function (to) {
+          if (to.length > 0) {
+            this.img = this.url + '/image/' + to[0]
+          } else this.img = defaultImg
+        },
+        deep: true,
       },
     },
     methods: {

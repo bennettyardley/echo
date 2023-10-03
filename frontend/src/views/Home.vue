@@ -4,7 +4,7 @@
     <div class="container mx-auto max-w-3xl">
       <Stats class="py-4" />
       <Entries class="py-4" />
-      <Artists class="py-4" />
+      <Artists class="py-4 mb-20" />
     </div>
   </div>
 </template>

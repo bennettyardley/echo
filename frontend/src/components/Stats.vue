@@ -30,7 +30,7 @@
         unique: {},
       }
     },
-    async mounted() {
+    async beforeMount() {
       const response = await axios.get(import.meta.env.VITE_API + '/stats')
       this.year = response.data.year
       this.unique = response.data.unique
