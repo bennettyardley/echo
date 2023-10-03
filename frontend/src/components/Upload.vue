@@ -59,17 +59,21 @@
       return {
         myServer: {
           process: async (fieldName, file, metadata, load) => {
-            await this.uploadFileInChunks(file)
-            if (this.artists.length > 1) {
-              this.fileName = file.name
-              this.artistModal = true
-              await this.addMedia(file.name)
-            } else {
-              await this.addMedia(file.name)
-              this.oneArtistMedia(file.name)
+            try {
+              await this.uploadFileInChunks(file)
+              if (this.artists.length > 1) {
+                this.fileName = file.name
+                this.artistModal = true
+                await this.addMedia(file.name)
+              } else {
+                await this.addMedia(file.name)
+                this.oneArtistMedia(file.name)
+              }
+              this.$emit('addedMedia', file.name)
+              load()
+            } catch (err) {
+              console.log(err)
             }
-            this.$emit('addedMedia', file.name)
-            load()
           },
           load: (source, load) => {
             return true

@@ -8,7 +8,7 @@
           <div class="stat-desc text-primary-content">{{ year.pct }}</div>
         </div>
       </div>
-      <div class="stats bg-primary text-primary-content">
+      <div class="ml-5 stats bg-primary text-primary-content">
         <div class="stat">
           <div class="stat-title text-primary-content">Unique Artists</div>
           <div class="stat-value">{{ unique.num }}</div>

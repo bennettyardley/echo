@@ -3,6 +3,8 @@
     <!-- Navbar Component -->
     <Navbar />
     <div class="container mx-auto flex flex-col items-center justify-center w-6/12">
+      <p v-if="error !== ''" class="">{{ this.error }}</p>
+
       <!-- Artists -->
       <div class="w-full mt-5">
         <v-select
@@ -148,6 +150,7 @@
         first: true,
         second: true,
         deleteOpen: false,
+        error: '',
       }
     },
     watch: {
@@ -191,6 +194,17 @@
       updateOther: _debounce(function () {
         if (this.first) {
           this.first = false
+          return
+        }
+        this.error = ''
+        if (this.artists.length === 0) {
+          this.error = 'At least one artist is required'
+          return
+        } else if (this.venue === '' || this.venue === null) {
+          this.error = 'Enter a venue'
+          return
+        } else if (this.entryDate === null) {
+          this.error = 'Enter a date'
           return
         }
         axios

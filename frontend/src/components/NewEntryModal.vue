@@ -6,6 +6,7 @@
       <div class="modal-box flex max-w-none w-3/5 h-3/4 justify-center">
         <form method="dialog" class="text-center w-3/5">
           <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeModal">✕</button>
+          <p v-if="newError !== ''" class="">{{ this.newError }}</p>
           <h3 class="font-bold text-xl mt-5">Had Fun? Log your concert:</h3>
           <div class="mt-5">
             <v-select
@@ -55,12 +56,15 @@
       return { form }
     },
     name: 'NewEntryModal',
-    data: () => ({
-      newArtists: [],
-      newVenue: '',
-      newEntryDate: new Date(),
-      open: false,
-    }),
+    data() {
+      return {
+        newArtists: [],
+        newVenue: '',
+        newEntryDate: new Date(),
+        open: false,
+        newError: '',
+      }
+    },
     async beforeMount() {
       if (this.form.allArtists.length === 0 || this.form.allVenues.length === 0) await this.form.refresh()
     },
@@ -69,6 +73,17 @@
         this.open = false
       },
       async submit() {
+        this.newError = ''
+        if (this.newArtists.length === 0) {
+          this.newError = 'At least one artist is required'
+          return
+        } else if (this.newVenue === '' || this.newVenue === null) {
+          this.newError = 'Enter a venue'
+          return
+        } else if (this.newEntryDate === null) {
+          this.newError = 'Enter a date'
+          return
+        }
         const response = await axios.post(import.meta.env.VITE_API + '/entry', {
           artists: this.newArtists,
           venue: this.newVenue,

@@ -53,9 +53,11 @@
       },
       media: {
         handler: function (to) {
-          if (to.length > 0) {
-            this.img = this.url + '/image/' + to[0]
-          } else this.img = defaultImg
+          if (to) {
+            if (to.length > 0) {
+              this.img = this.url + '/image/' + to[0]
+            } else this.img = defaultImg
+          }
         },
         deep: true,
       },
