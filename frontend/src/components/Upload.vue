@@ -121,12 +121,9 @@
       oneArtistMedia(name) {
         axios
           .put(import.meta.env.VITE_API + '/artist', { artists: this.artists, media: name })
-          .then((res) => {
-            resolve(true)
-          })
+          .then((res) => {})
           .catch((err) => {
             console.log(err)
-            reject(false)
           })
       },
 

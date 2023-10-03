@@ -8,6 +8,11 @@
 
 <style>
   @tailwind base;
+  @layer base {
+    img {
+      @apply inline-block;
+    }
+  }
   @tailwind components;
   @tailwind utilities;
   @tailwind variants;

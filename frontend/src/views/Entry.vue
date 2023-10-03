@@ -61,7 +61,7 @@
       <!-- Share and Delete -->
       <div class="w-full mt-5 flex justify-between items-center">
         <div class="mt-5">
-          <Share class="" />
+          <Share :artists="artists" :venue="venue" :date="entryDate" :media="media" />
         </div>
         <div class="mt-5">
           <label for="deleteModal" class="btn btn-error">Delete</label>
