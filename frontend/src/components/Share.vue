@@ -4,9 +4,10 @@
 
     <div
       ref="contentToCapture"
-      class="bg-secondary rounded-3xl overflow-hidden"
+      class="rounded-3xl overflow-hidden"
+      :class="randColor"
       style="width: 800px; height: 1200px; position: absolute; left: -9999px">
-      <!-- <div ref="contentToCapture" class="bg-secondary rounded-3xl overflow-hidden" style="width: 800px; height: 1200px"> -->
+      <!-- <div ref="contentToCapture" class="rounded-3xl overflow-hidden" :class="randColor" style="width: 800px; height: 1200px"> -->
       <div class="px-2" style="height: 400px">
         <p class="text-8xl uppercase font-bold">{{ venue }}</p>
         <p class="text-3xl">presents</p>
@@ -38,7 +39,12 @@
         dateStr: new Date().toDateString(),
         img: defaultImg,
         url: import.meta.env.VITE_API,
+        colors: ['bg-primary', 'bg-secondary', 'bg-accent'],
+        randColor: '',
       }
+    },
+    beforeMount() {
+      this.randColor = this.colors[Math.floor(Math.random() * this.colors.length)]
     },
     props: ['artists', 'venue', 'date', 'media'],
     watch: {
@@ -69,6 +75,7 @@
         link.href = imgData
         link.download = 'ticket.png' // Set the desired filename with .png extension
         link.click()
+        this.randColor = this.colors[Math.floor(Math.random() * this.colors.length)]
       },
     },
   }
