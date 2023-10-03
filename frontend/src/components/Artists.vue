@@ -102,7 +102,7 @@
             }
           } else {
             this.artists[i] = {
-              venue: 'None Yet',
+              artist: 'None Yet',
               count: 0,
               media: defaultArtistImg,
             }
