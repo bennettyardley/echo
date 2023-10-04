@@ -550,7 +550,7 @@ app.get('/data', async (req, res) => {
     { artists: ['Galantis'], date: '2019-03-29T01:50:00.000Z', key: '6qxececuh8g8', media: ['IMG_2963.jpg'], venue: 'Franklin Music Hall' },
     { artists: ['100 gecs'], date: '2020-04-27T02:03:00.000Z', key: '73dxynmfoaqj', venue: 'The Foundry' },
     { artists: ['Seven Lions', 'Mitis'], date: '2023-05-13T02:16:00.000Z', key: '75p9iprexjht', venue: 'The Fillmore Philly' },
-    { artists: ['100 gecs'], date: '2021-12-09T03:11:00.000Z', key: '7c4lw91tmzt0', venue: 'Union Transfer' },
+    { artists: ['100 gecs'], date: '2021-12-09T03:11:00.000Z', key: '7c4lw91tmzt0', media: ['IMG_1403.jpg'], venue: 'Union Transfer' },
     { artists: ['Illenium', 'Blackbear', '21 Savage', 'Tiesto'], date: '2019-08-12T02:24:00.000Z', key: '7z59m1euwq1b', venue: 'Moonrise' },
     {
       artists: ['Riz La Vie', 'Johan Lenox'],
@@ -604,7 +604,7 @@ app.get('/data', async (req, res) => {
     { artists: ['Hardwell'], date: '2023-05-18T02:38:00.000Z', key: 'cl77eifzmmus', venue: 'NOTO' },
     { artists: ['Jack Harlow', 'Swae Lee'], date: '2022-04-22T02:29:00.000Z', key: 'e842p9a2v2wq', venue: 'Liacouras Center' },
     { artists: ['Porter Robinson'], date: '2021-10-18T02:09:00.000Z', key: 'f246m6r409j3', venue: 'The Met Philly' },
-    { artists: ['Amine'], date: '2022-03-02T03:12:00.000Z', key: 'f4bhy0hr2jkj', venue: 'The Fillmore Philly' },
+    { artists: ['Amine'], date: '2022-03-02T03:12:00.000Z', key: 'f4bhy0hr2jkj', media: ['IMG_2002.jpeg'], venue: 'The Fillmore Philly' },
     { artists: ['Amine'], date: '2019-10-06T02:25:00.000Z', key: 'frt98eo7oy0d', venue: 'Lot F' },
     {
       artists: [
@@ -693,6 +693,8 @@ app.get('/data', async (req, res) => {
   ]
 
   const artists = [
+    { key: '100 gecs', media: ['IMG_1403.jpg'] },
+    { key: 'Amine', media: ['IMG_2002.jpeg'] },
     { key: 'Brockhampton', media: ['IMG_3892.jpg'] },
     { key: 'Flux Pavilion', media: ['IMG_5319.jpg'] },
     { key: 'Galantis', media: ['IMG_2963.jpg'] },
@@ -705,12 +707,12 @@ app.get('/data', async (req, res) => {
   ]
 
   for (let i = 0; i < echo.length; i += 25) {
-    const chunk = echo.slice(i, i + 25) // Get a chunk of items
-    await db.putMany(chunk) // Insert the chunk into the database
+    const chunk = echo.slice(i, i + 25)
+    await db.putMany(chunk)
   }
   for (let i = 0; i < artists.length; i += 25) {
-    const chunk = artists.slice(i, i + 25) // Get a chunk of items
-    await db2.putMany(chunk) // Insert the chunk into the database
+    const chunk = artists.slice(i, i + 25)
+    await db2.putMany(chunk)
   }
   res.sendStatus(200)
 })
