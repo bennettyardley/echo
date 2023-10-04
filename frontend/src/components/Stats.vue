@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div class="stats bg-accent text-primary-content">
+  <div class="container flex flex-row gap-4">
+    <div class="flex-col grow stats bg-accent text-primary-content">
       <div class="stat place-items-center">
         <div class="stat-title text-primary-content">Concerts</div>
         <div class="stat-value">{{ concertStats.total }}</div>
@@ -13,7 +13,7 @@
         <div class="stat-desc text-primary-content">{{ concertStats.yearText }}</div>
       </div>
     </div>
-    <div class="stats bg-primary text-primary-content">
+    <div class="flex-col grow stats bg-primary text-primary-content">
       <div class="stat place-items-center">
         <div class="stat-title text-primary-content">Artists</div>
         <div class="stat-value">{{ artistStats.total }}</div>

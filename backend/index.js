@@ -227,25 +227,50 @@ function getContentType(fileName) {
     case 'jpg':
     case 'jpeg':
       return 'image/jpeg'
-    case 'gif':
-      return 'image/gif'
-    // Add more cases as needed for other image formats
     default:
       return 'application/octet-stream' // Default to binary data
   }
+}
+
+function search(entries, query) {
+  return new Promise((resolve, reject) => {
+    // Normalize the query to lowercase for case-insensitive search
+    const normalizedQuery = query.toLowerCase()
+
+    // Filter entries based on the search query
+    const searchedEntries = entries.filter((entry) => {
+      // Check if any artist name matches the query
+      const artistMatch = entry.artists.some((artist) => artist.toLowerCase().includes(normalizedQuery))
+
+      // Check if the venue name matches the query
+      const venueMatch = entry.venue.toLowerCase().includes(normalizedQuery)
+
+      // Return true if either artist or venue matches the query
+      return artistMatch || venueMatch
+    })
+
+    // Resolve the Promise with the searched entries
+    resolve(searchedEntries)
+  })
 }
 
 app.get('/formData', async (req, res) => {
   const allEntries = await db.fetch()
   let venues = []
   let artists = []
+  let genres = []
   for (let entry of allEntries.items) {
     if (!venues.includes(entry.venue) && entry.venue !== null && entry.venue !== undefined && entry.venue !== '') venues.push(entry.venue)
     for (let artist of entry.artists) {
       if (!artists.includes(artist) && artist !== null && artist !== undefined && artist !== '') artists.push(artist)
     }
+    if (entry.genres) {
+      for (let genre of entry.genres) {
+        if (!genres.includes(genre) && genre !== null && genre !== undefined && genre !== '') genres.push(genre)
+      }
+    }
   }
-  res.json({ venues, artists })
+  res.json({ venues, artists, genres })
 })
 
 app.get('/artist/:artist/:page', async (req, res) => {
@@ -438,6 +463,37 @@ app.get('/entries/:page', async (req, res) => {
   })
 
   const slicedEntries = allEntries.items.slice(start, end)
+
+  const entries = []
+  for (let entry of slicedEntries) {
+    entries.push({
+      favorite: entry.favorite,
+      artists: entry.artists.join(', '),
+      venue: entry.venue,
+      date: d2s(entry.date),
+      id: entry.key,
+    })
+  }
+
+  res.status(200).json({ pages, entries })
+})
+
+app.get('/search/:query/:page', async (req, res) => {
+  const allEntries = await db.fetch()
+  const searchedEntries = await search(allEntries.items, req.params.query)
+
+  const pages = Math.ceil(searchedEntries.length / 10)
+
+  const start = (req.params.page - 1) * 10
+  const end = Math.min(start + 10, searchedEntries.length)
+
+  searchedEntries.sort((a, b) => {
+    const dateA = new Date(a.date)
+    const dateB = new Date(b.date)
+    return dateB - dateA
+  })
+
+  const slicedEntries = searchedEntries.slice(start, end)
 
   const entries = []
   for (let entry of slicedEntries) {

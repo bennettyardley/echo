@@ -1,10 +1,11 @@
 <template>
   <div>
+    <input type="text" class="input input-bordered border-neutral mb-2" v-model="query" placeholder="Search" />
     <div class="card card-bordered overflow-hidden">
       <table v-if="table.length === 0" class="table">
         <tbody>
           <tr class="hover:bg-secondary hover:text-primary-content">
-            <td>No Entries Yet</td>
+            <td>No Entries</td>
           </tr>
         </tbody>
       </table>
@@ -61,6 +62,7 @@
 
 <script>
   import axios from 'axios'
+  import _debounce from 'lodash/debounce'
 
   export default {
     name: 'Entries',
@@ -69,6 +71,7 @@
         table: [],
         page: 1,
         pages: 1,
+        query: '',
       }
     },
     async beforeMount() {
@@ -76,7 +79,24 @@
       this.table = response.data.entries
       this.pages = response.data.pages
     },
+    watch: {
+      query(val) {
+        this.search(val)
+      },
+    },
     methods: {
+      search: _debounce(async function (value) {
+        if (this.query !== '') {
+          this.page = 1
+          const response = await axios.get(import.meta.env.VITE_API + '/search/' + this.query + '/1')
+          this.table = response.data.entries
+          this.pages = response.data.pages
+        } else {
+          const response = await axios.get(import.meta.env.VITE_API + '/entries/1')
+          this.table = response.data.entries
+          this.pages = response.data.pages
+        }
+      }, 500),
       peek(into, type, link) {
         if (into.target.nodeName && into.target.nodeName.toLowerCase() === 'td') this.$router.push('/entry/' + link)
         else if (into.target.nodeName && into.target.nodeName.toLowerCase() === 'div' && into.target.className !== 'swap-on')
@@ -96,10 +116,17 @@
       },
       async pageTo(n) {
         if (n === this.page) return
-        const response = await axios.get(import.meta.env.VITE_API + '/entries/' + n)
-        this.table = response.data.entries
-        this.pages = response.data.pages
-        this.page = n
+        if (this.query === '') {
+          const response = await axios.get(import.meta.env.VITE_API + '/entries/' + n)
+          this.table = response.data.entries
+          this.pages = response.data.pages
+          this.page = n
+        } else {
+          const response = await axios.get(import.meta.env.VITE_API + '/search/' + this.query + '/' + n)
+          this.table = response.data.entries
+          this.pages = response.data.pages
+          this.page = n
+        }
       },
     },
   }

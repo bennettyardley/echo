@@ -25,6 +25,18 @@
           class="p-1 outline rounded outline-secondary"></v-select>
       </div>
 
+      <!-- Genres -->
+      <div class="w-full mt-5">
+        <v-select
+          multiple
+          taggable
+          placeholder="Genres"
+          :options="form.allGenres"
+          v-model="genres"
+          @change="updateGenres"
+          class="p-1 outline rounded outline-secondary"></v-select>
+      </div>
+
       <!-- Venue -->
       <div class="w-full mt-5 flex justify-between items-center">
         <span class="text-lg">Venue:</span>
@@ -34,6 +46,12 @@
           v-model="venue"
           @change="updateVenues"
           class="outline rounded outline-secondary w-9/12"></v-select>
+      </div>
+
+      <!-- Location -->
+      <div class="w-full mt-5 flex justify-between items-center">
+        <span class="text-lg">Location:</span>
+        <input v-model="location" type="text" class="outline py-1 px-3 rounded outline-secondary bg-base-100 w-9/12" />
       </div>
 
       <!-- Date Picker -->
@@ -49,12 +67,19 @@
 
       <!-- Rating and Favorite -->
       <div class="w-full mt-5 flex justify-between items-center">
-        <div class="rating gap-1">
-          <input type="radio" id="1" name="rating" class="mask mask-star-2 bg-red-400" :checked="rate[1]" />
-          <input type="radio" id="2" name="rating" class="mask mask-star-2 bg-orange-400" :checked="rate[2]" />
-          <input type="radio" id="3" name="rating" class="mask mask-star-2 bg-yellow-400" :checked="rate[3]" />
-          <input type="radio" id="4" name="rating" class="mask mask-star-2 bg-lime-400" :checked="rate[4]" />
-          <input type="radio" id="5" name="rating" class="mask mask-star-2 bg-green-400" :checked="rate[5]" />
+        <div v-if="ratingInitial" class="ratingBlank gap-1 inline-flex">
+          <input type="radio" name="ratingBlank" class="mask mask-star-2 bg-red-400 opacity-20" @click="initalRate(1)" />
+          <input type="radio" name="ratingBlank" class="mask mask-star-2 bg-orange-400 opacity-20" @click="initalRate(2)" />
+          <input type="radio" name="ratingBlank" class="mask mask-star-2 bg-yellow-400 opacity-20" @click="initalRate(3)" />
+          <input type="radio" name="ratingBlank" class="mask mask-star-2 bg-lime-400 opacity-20" @click="initalRate(4)" />
+          <input type="radio" name="ratingBlank" class="mask mask-star-2 bg-green-400 opacity-20" @click="initalRate(5)" />
+        </div>
+        <div v-if="!ratingInitial" class="rating gap-1">
+          <input type="radio" id="1" name="rating" class="mask mask-star-2 bg-red-400" :checked="rate[1]" @click="updateRating(1)" />
+          <input type="radio" id="2" name="rating" class="mask mask-star-2 bg-orange-400" :checked="rate[2]" @click="updateRating(2)" />
+          <input type="radio" id="3" name="rating" class="mask mask-star-2 bg-yellow-400" :checked="rate[3]" @click="updateRating(3)" />
+          <input type="radio" id="4" name="rating" class="mask mask-star-2 bg-lime-400" :checked="rate[4]" @click="updateRating(4)" />
+          <input type="radio" id="5" name="rating" class="mask mask-star-2 bg-green-400" :checked="rate[5]" @click="updateRating(5)" />
         </div>
         <label class="swap swap-rotate">
           <input type="checkbox" v-model="favorite" @change="updateFavorite" />
@@ -158,9 +183,15 @@
         id: this.$route.params.id,
         first: true,
         second: true,
+        third: true,
+        fourth: true,
         deleteOpen: false,
         error: '',
         toast: false,
+        ratingInitial: true,
+        lastRating: 0,
+        genres: [],
+        location: '',
       }
     },
     watch: {
@@ -170,8 +201,14 @@
       artists: function () {
         this.updateOther()
       },
+      genres: function () {
+        this.updateGenre()
+      },
       venue: function () {
         this.updateOther()
+      },
+      location: function () {
+        this.updateLocation()
       },
       entryDate: function () {
         this.updateOther()
@@ -185,7 +222,15 @@
       this.favorite = response.data.favorite
       this.comment = response.data.comment
       this.media = response.data.media
-      this.rate[response.data.rating] = true
+      if (response.data.rating) {
+        if (response.data.rating !== 0) {
+          this.ratingInitial = false
+          this.rate[response.data.rating] = true
+          this.lastRating = response.data.rating
+        }
+      }
+      this.genres = response.data.genres
+      this.location = response.data.location
       await this.form.refresh()
     },
     created() {
@@ -230,13 +275,49 @@
             console.log(err)
           })
       }, 500),
-      updateRating(field) {
+      updateGenre: _debounce(function () {
+        if (this.third) {
+          this.third = false
+          return
+        }
         axios
-          .patch(import.meta.env.VITE_API + '/entry', { id: this.id, rating: field.target.id })
+          .patch(import.meta.env.VITE_API + '/entry', { id: this.id, genres: this.genres })
           .then((res) => {})
           .catch((err) => {
             console.log(err)
           })
+      }, 500),
+      updateLocation: _debounce(function () {
+        if (this.fourth) {
+          this.fourth = false
+          return
+        }
+        axios
+          .patch(import.meta.env.VITE_API + '/entry', { id: this.id, location: this.location })
+          .then((res) => {})
+          .catch((err) => {
+            console.log(err)
+          })
+      }, 1000),
+      updateRating(n) {
+        if (n !== this.lastRating) {
+          this.lastRating = n
+          axios
+            .patch(import.meta.env.VITE_API + '/entry', { id: this.id, rating: n })
+            .then((res) => {})
+            .catch((err) => {
+              console.log(err)
+            })
+        } else {
+          this.lastRating = 0
+          this.ratingInitial = true
+          axios
+            .patch(import.meta.env.VITE_API + '/entry', { id: this.id, rating: 0 })
+            .then((res) => {})
+            .catch((err) => {
+              console.log(err)
+            })
+        }
       },
       updateFavorite() {
         axios
@@ -251,6 +332,13 @@
           this.form.addArtist(this.artists.slice(-1)[0])
         } else {
           this.form.addArtist(this.artists.slice(-1)[0].label)
+        }
+      },
+      updateGenres() {
+        if (typeof this.genres.slice(-1)[0] === 'string') {
+          this.form.addArtist(this.genres.slice(-1)[0])
+        } else {
+          this.form.addArtist(this.genres.slice(-1)[0].label)
         }
       },
       updateVenues() {
@@ -278,8 +366,35 @@
       closeDeleteModal() {
         this.deleteOpen = false
       },
+      initalRate(n) {
+        this.ratingInitial = false
+        this.rate[n] = true
+        this.lastRating = n
+        axios
+          .patch(import.meta.env.VITE_API + '/entry', { id: this.id, rating: n })
+          .then((res) => {})
+          .catch((err) => {
+            console.log(err)
+          })
+      },
     },
   }
 </script>
 
-<style></style>
+<style>
+  .ratingBlank {
+    position: relative;
+    display: inline-flex;
+  }
+  .ratingBlank input {
+    -moz-appearance: none;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .ratingBlank :where(input) {
+    cursor: pointer;
+    border-radius: 0px;
+    height: 1.5rem;
+    width: 1.5rem;
+  }
+</style>
