@@ -529,6 +529,192 @@ app.get('/key', async (req, res) => {
   res.json({ key: process.env.DETA_PROJECT_KEY })
 })
 
+app.get('/data', async (req, res) => {
+  const echo = [
+    { artists: ['Dom Dolla'], date: '2023-02-12T03:14:00.000Z', key: '1gwl1ewzfafo', venue: 'The Ave' },
+    {
+      artists: ['Martin Garrix', 'Joel Corry', 'Audien', 'Vintage Culture', 'James Hype', 'Wooli', 'Whethan', 'Troyboi', 'DJ Snake'],
+      date: '2022-11-14T03:34:00.000Z',
+      key: '200vafqlrca8',
+      venue: 'EDC Orlando',
+    },
+    {
+      artists: ['Lil Durk', 'Roddy Ricch', 'Bobby Shmurda', 'Justin Bieber'],
+      date: '2021-09-06T02:26:00.000Z',
+      key: '4skhzk4fvop3',
+      venue: 'Made in America',
+    },
+    { artists: ['Loud Luxury'], date: '2019-11-10T02:57:00.000Z', key: '5e5bu76d3dtn', venue: 'Franklin Music Hall' },
+    { artists: ['Armnhmr'], date: '2021-08-21T02:06:00.000Z', key: '5y12u62oo63z', venue: 'The Ave' },
+    { artists: ['Martin Garrix'], date: '2019-09-29T01:52:00.000Z', key: '6ajy17tw7f8j', venue: 'Wells Fargo Center' },
+    { artists: ['Galantis'], date: '2019-03-29T01:50:00.000Z', key: '6qxececuh8g8', media: ['IMG_2963.jpg'], venue: 'Franklin Music Hall' },
+    { artists: ['100 gecs'], date: '2020-04-27T02:03:00.000Z', key: '73dxynmfoaqj', venue: 'The Foundry' },
+    { artists: ['Seven Lions', 'Mitis'], date: '2023-05-13T02:16:00.000Z', key: '75p9iprexjht', venue: 'The Fillmore Philly' },
+    { artists: ['100 gecs'], date: '2021-12-09T03:11:00.000Z', key: '7c4lw91tmzt0', venue: 'Union Transfer' },
+    { artists: ['Illenium', 'Blackbear', '21 Savage', 'Tiesto'], date: '2019-08-12T02:24:00.000Z', key: '7z59m1euwq1b', venue: 'Moonrise' },
+    {
+      artists: ['Riz La Vie', 'Johan Lenox'],
+      date: '2023-03-03T03:15:00.000Z',
+      key: '8dqplyki48gc',
+      media: ['IMG_5054.jpg'],
+      venue: 'The Foundry',
+    },
+    {
+      artists: ['Travis Scott', 'Kygo', 'Brockhampton', 'Alison Wonderland', '$uicideboy$', 'Saba', 'Passion Pit', 'Flipp Dinero'],
+      date: '2019-06-23T02:22:00.000Z',
+      key: '8dtu1vsxguek',
+      venue: 'Firefly',
+    },
+    {
+      artists: [
+        'Cheat Codes',
+        'Adventure Club',
+        'Two Friends',
+        'Zedd',
+        'Mitis',
+        'Audien',
+        'Lost Kings',
+        'Subtronics',
+        'Zeds Dead',
+        'Don Diablo',
+        'Teisto',
+      ],
+      date: '2022-08-08T02:31:00.000Z',
+      key: '8fd2mio52fxb',
+      venue: 'Moonrise',
+    },
+    { artists: ['100 gecs'], date: '2023-04-27T02:16:00.000Z', key: '8ymreuelvnr9', venue: 'Franklin Music Hall' },
+    { artists: ['Charli XCX'], date: '2022-04-19T02:13:00.000Z', key: 'advrgz2yax9m', venue: 'The Fillmore Philly' },
+    {
+      artists: ['The Lumineers', 'Death Cab for Cutie', 'Grouplove'],
+      date: '2019-06-03T01:50:00.000Z',
+      key: 'afz9giqit8to',
+      venue: 'BB\u0026T Pavilion',
+    },
+    { artists: ['Subtronics'], date: '2023-02-18T03:15:00.000Z', key: 'ahc0rra6rcde', media: ['IMG_5031.jpg'], venue: 'The Met Philly' },
+    { artists: ['Mitis'], date: '2021-10-16T02:08:00.000Z', key: 'bj4ojs5k0tvl', media: ['IMG_1235.jpg'], venue: 'The Ave' },
+    { artists: ['Cash Cash'], date: '2021-08-15T02:05:00.000Z', key: 'bvv7n3rv49md', venue: 'The Ave' },
+    {
+      artists: ['Wavedash', 'Crankdat', 'Gryffin', 'Tiesto', 'Kream', 'Timmy Trumpet', 'Madeon', 'Zeds Dead', 'Kygo', 'Kill The Noise'],
+      date: '2023-05-01T02:35:00.000Z',
+      key: 'cdgk688q7yoy',
+      venue: 'Project Glow',
+    },
+    { artists: ['24kGoldn'], date: '2022-05-17T03:00:00.000Z', key: 'ci3q4iuo84iw', venue: 'The Foundry' },
+    { artists: ['Hardwell'], date: '2023-05-18T02:38:00.000Z', key: 'cl77eifzmmus', venue: 'NOTO' },
+    { artists: ['Jack Harlow', 'Swae Lee'], date: '2022-04-22T02:29:00.000Z', key: 'e842p9a2v2wq', venue: 'Liacouras Center' },
+    { artists: ['Porter Robinson'], date: '2021-10-18T02:09:00.000Z', key: 'f246m6r409j3', venue: 'The Met Philly' },
+    { artists: ['Amine'], date: '2022-03-02T03:12:00.000Z', key: 'f4bhy0hr2jkj', venue: 'The Fillmore Philly' },
+    { artists: ['Amine'], date: '2019-10-06T02:25:00.000Z', key: 'frt98eo7oy0d', venue: 'Lot F' },
+    {
+      artists: [
+        'Earthgang',
+        '99 Neighbors',
+        '24kGoldn',
+        'Billie Eilish',
+        'Bleachers',
+        'Cordae',
+        'Amine',
+        'A$AP Rocky',
+        'Dominic Fike',
+        'Post Malone',
+      ],
+      date: '2021-09-27T02:28:00.000Z',
+      key: 'ft2ne0pouelg',
+      venue: 'Governors Ball',
+    },
+    { artists: ['100 gecs', 'Tony Velour'], date: '2020-02-07T03:02:00.000Z', key: 'hewrvg7tnsg2', venue: 'Rotunda' },
+    { artists: ['Puppet'], date: '2022-10-09T02:13:00.000Z', key: 'hq8dvxhki6vk', venue: 'Kung Fu Necktie' },
+    { artists: ['Party Favor'], date: '2022-10-16T02:14:00.000Z', key: 'ihw32xaj7xlf', venue: 'Marquee' },
+    { artists: ['Ericdoa'], date: '2022-04-30T02:13:00.000Z', key: 'jtknzum6h6g1', venue: 'The Foundry' },
+    { artists: ['Madeon'], date: '2019-12-05T03:00:00.000Z', key: 'lbcojyegsspy', media: ['IMG_3938.jpg'], venue: 'Franklin Music Hall' },
+    {
+      artists: ['Brockhampton', 'Slowthai', '100 gecs'],
+      date: '2019-11-28T02:59:00.000Z',
+      key: 'lmj8kc9ftpdt',
+      media: ['IMG_3892.jpg'],
+      venue: 'The Fillmore Philly',
+    },
+    { artists: ['Glaive', 'aldn', 'midwxst'], date: '2022-02-21T03:11:00.000Z', key: 'ltce3jcxvkb3', venue: 'The Foundry' },
+    { artists: ['Saint Motel'], date: '2020-02-11T03:02:00.000Z', key: 'nn9r9jqar73u', venue: 'Theatre of Living Arts' },
+    { artists: ['Buku'], date: '2020-03-01T03:03:00.000Z', key: 'nrc5qqb9w8si', venue: 'The Ave' },
+    { artists: ['Smallpools'], date: '2021-11-06T02:10:00.000Z', key: 'nx3h59x9op8k', venue: 'The Foundry' },
+    {
+      artists: ['Slander', 'Wavedash', 'Zomboy'],
+      date: '2023-10-08T12:13:00.000Z',
+      genres: [],
+      key: 'o5nfu7iqx763',
+      location: null,
+      rating: 0,
+      venue: 'Brooklyn Mirage',
+    },
+    {
+      artists: ['Zomboy', 'Ray Volpe', 'Loud Luxury', 'Sam Feldt', 'Alok', 'Dillon Francis', 'Alan Walker', 'Kaskade'],
+      date: '2023-08-14T02:39:00.000Z',
+      genres: [],
+      key: 'om5mp7ilhnx8',
+      venue: 'Moonrise',
+    },
+    {
+      artists: ['Neon Trees', 'Laundry Day'],
+      date: '2023-09-27T02:17:00.000Z',
+      genres: [],
+      key: 'oxkfv2vfarwt',
+      media: ['IMG_6739.jpg'],
+      rating: 0,
+      venue: 'Theatre of Living Arts',
+    },
+    {
+      artists: ['Young the Giant', 'Walk the Moon', 'Matt and Kim', 'lovelytheband'],
+      date: '2019-02-10T03:19:00.000Z',
+      key: 'pscewgdezwsf',
+      venue: 'Wells Fargo Center',
+    },
+    { artists: ['AJR'], date: '2019-11-15T02:58:00.000Z', key: 'rdr95c94ei3p', venue: 'The Met Philly' },
+    { artists: ['Flo Rida', 'Bebe Rexha'], date: '2021-07-05T02:04:00.000Z', key: 'sfkgwk6v4zyh', venue: 'The Mann' },
+    { artists: ['Emo Night Brooklyn'], date: '2021-08-14T02:05:00.000Z', key: 'tu1jlpt10k4d', venue: 'The Foundry' },
+    { artists: ['Injury Reserve'], date: '2019-09-27T01:51:00.000Z', key: 'v4me18jdfllx', venue: 'The Foundry' },
+    { artists: ['Flux Pavilion'], date: '2023-05-13T02:37:00.000Z', key: 'wbnriiizbe2x', media: ['IMG_5319.jpg'], venue: 'The Ave' },
+    {
+      artists: ['Jaden Smith', 'Will Smith', 'Tyler Cole'],
+      date: '2019-11-26T02:58:00.000Z',
+      key: 'wvtyauxn8uba',
+      venue: 'The Fillmore Philly',
+    },
+    { artists: ['Deadmau5'], date: '2020-01-25T03:01:00.000Z', key: 'yuk4ikw4h68c', venue: 'The Met Philly' },
+    {
+      artists: ['Vince Staples', 'Galantis', 'Illenium', 'Marshmello'],
+      date: '2018-08-13T02:17:00.000Z',
+      key: 'ywt0zracokyd',
+      venue: 'Moonrise',
+    },
+    { artists: ['NOTD'], date: '2021-10-02T02:08:00.000Z', key: 'z5rqxg6nhlob', media: ['IMG_4024.jpg'], venue: 'The Ave' },
+    { artists: ['Earl Sweatshirt', 'Na-Kel Smith'], date: '2019-03-29T01:49:00.000Z', key: 'zvxbi6ao52h3', venue: 'Baltimore Soundstage' },
+  ]
+
+  const artists = [
+    { key: 'Brockhampton', media: ['IMG_3892.jpg'] },
+    { key: 'Flux Pavilion', media: ['IMG_5319.jpg'] },
+    { key: 'Galantis', media: ['IMG_2963.jpg'] },
+    { key: 'Johan Lenox', media: ['IMG_5054.jpg'] },
+    { key: 'Madeon', media: ['IMG_3938.jpg'] },
+    { key: 'Mitis', media: ['IMG_1235.jpg'] },
+    { key: 'NOTD', media: ['IMG_4024.jpg'] },
+    { key: 'Neon Trees', media: ['IMG_6739.jpg'] },
+    { key: 'Subtronics', media: ['IMG_5031.jpg'] },
+  ]
+
+  for (let i = 0; i < echo.length; i += 25) {
+    const chunk = echo.slice(i, i + 25) // Get a chunk of items
+    await db.putMany(chunk) // Insert the chunk into the database
+  }
+  for (let i = 0; i < artists.length; i += 25) {
+    const chunk = artists.slice(i, i + 25) // Get a chunk of items
+    await db2.putMany(chunk) // Insert the chunk into the database
+  }
+  res.sendStatus(200)
+})
+
 app.listen(port, () => {
   console.log(`App listening on port ${port}!`)
 })
