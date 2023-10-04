@@ -21,7 +21,7 @@ function d2s(date) {
   const dateObj = new Date(date)
   const inputDateTime = dateObj.getTime()
   const currentDateTime = currentDate.getTime()
-  const timeDifference = currentDateTime - inputDateTime
+  const timeDifference = inputDateTime - currentDateTime
 
   const minute = 60 * 1000
   const hour = 60 * minute
@@ -30,65 +30,118 @@ function d2s(date) {
   const month = 30 * day
   const year = 365 * day
 
-  if (timeDifference < week) {
-    const daysAgo = Math.floor(timeDifference / day)
-    return `${daysAgo} day${daysAgo !== 1 ? 's' : ''} ago`
+  if (timeDifference < 0) {
+    // Date is in the past
+    if (timeDifference > -day) {
+      return 'Today'
+    } else if (timeDifference > -week) {
+      const daysAgo = Math.floor(-timeDifference / day)
+      return `${daysAgo} day${daysAgo !== 1 ? 's' : ''} ago`
+    } else if (timeDifference > -month) {
+      const weeksAgo = Math.floor(-timeDifference / week)
+      return `${weeksAgo} week${weeksAgo !== 1 ? 's' : ''} ago`
+    } else if (timeDifference > -year) {
+      const monthsAgo = Math.floor(-timeDifference / month)
+      return `${monthsAgo} month${monthsAgo !== 1 ? 's' : ''} ago`
+    } else if (timeDifference > -year * 2) {
+      return 'Last year'
+    } else {
+      const yearsAgo = Math.floor(-timeDifference / year)
+      return `${yearsAgo} year${yearsAgo !== 1 ? 's' : ''} ago`
+    }
+  } else if (timeDifference < day) {
+    return 'Today'
+  } else if (timeDifference < week) {
+    const daysLeft = Math.floor(timeDifference / day)
+    return `In ${daysLeft} day${daysLeft !== 1 ? 's' : ''}`
   } else if (timeDifference < month) {
-    const weeksAgo = Math.floor(timeDifference / week)
-    return `${weeksAgo} week${weeksAgo !== 1 ? 's' : ''} ago`
+    const weeksLeft = Math.floor(timeDifference / week)
+    return `In ${weeksLeft} week${weeksLeft !== 1 ? 's' : ''}`
   } else if (timeDifference < year) {
-    const monthsAgo = Math.floor(timeDifference / month)
-    return `${monthsAgo} month${monthsAgo !== 1 ? 's' : ''} ago`
+    const monthsLeft = Math.floor(timeDifference / month)
+    return `In ${monthsLeft} month${monthsLeft !== 1 ? 's' : ''}`
+  } else if (timeDifference < year * 2) {
+    return 'Next year'
   } else {
-    const yearsAgo = Math.floor(timeDifference / year)
-    return `${yearsAgo} year${yearsAgo !== 1 ? 's' : ''} ago`
+    const yearsLeft = Math.floor(timeDifference / year)
+    return `In ${yearsLeft} year${yearsLeft !== 1 ? 's' : ''}`
   }
 }
 
 function yearStats(entries) {
   const currentYear = new Date().getFullYear()
 
+  // Filter entries for the current year
   const currentYearEntries = entries.filter((entry) => {
     const entryDate = new Date(entry.date)
     return entryDate.getFullYear() === currentYear
   })
 
+  // Filter entries for the previous year
   const previousYearEntries = entries.filter((entry) => {
     const entryDate = new Date(entry.date)
     return entryDate.getFullYear() === currentYear - 1
   })
 
+  // Calculate counts and changes for the current and previous year
   const currentYearCount = currentYearEntries.length
   const previousYearCount = previousYearEntries.length
+  const change = currentYearCount - previousYearCount
+  const percentChange = previousYearCount !== 0 ? Math.abs(Math.round((change / previousYearCount) * 100)) : 100
+  const changeType = change > 0 ? 'increase' : change < 0 ? 'decrease' : 'same'
 
-  const percentChange = previousYearCount !== 0 ? ((currentYearCount - previousYearCount) / previousYearCount) * 100 : 100
-
-  const uniqueArtistsCurrentYear = []
+  // Calculate unique artists for the current and previous year
+  const uniqueArtistsCurrentYear = new Set()
   for (let entry of currentYearEntries) {
     for (let artist of entry.artists) {
-      if (!uniqueArtistsCurrentYear.includes(artist)) uniqueArtistsCurrentYear.push(artist)
+      uniqueArtistsCurrentYear.add(artist)
     }
   }
+  const currentYearUniqueCount = uniqueArtistsCurrentYear.size
 
-  const uniqueArtistsPreviousYear = []
+  const uniqueArtistsPreviousYear = new Set()
   for (let entry of previousYearEntries) {
     for (let artist of entry.artists) {
-      if (!uniqueArtistsPreviousYear.includes(artist)) uniqueArtistsPreviousYear.push(artist)
+      uniqueArtistsPreviousYear.add(artist)
     }
   }
+  const previousYearUniqueCount = uniqueArtistsPreviousYear.size
 
-  const currentYearUniqueCount = uniqueArtistsCurrentYear.length
-  const previousYearUniqueCount = uniqueArtistsPreviousYear.length
+  // Calculate changes in unique artists for the current and previous year
+  const uniqueChange = currentYearUniqueCount - previousYearUniqueCount
+  const uniquePercentChange = previousYearUniqueCount !== 0 ? Math.abs(Math.round((uniqueChange / previousYearUniqueCount) * 100)) : 100
+  const uniqueChangeType = uniqueChange > 0 ? 'increase' : uniqueChange < 0 ? 'decrease' : 'same'
 
-  const uniquePercentChange =
-    previousYearUniqueCount !== 0 ? ((currentYearUniqueCount - previousYearUniqueCount) / previousYearUniqueCount) * 100 : 100
+  // Calculate total number of entries (all time)
+  const totalEntriesCount = entries.length
 
-  return {
-    currentYearCount,
-    percentChange,
-    unique: currentYearUniqueCount,
-    uniquePercent: uniquePercentChange,
+  // Calculate total number of unique artists (all time)
+  const allTimeUniqueArtists = new Set()
+  for (let entry of entries) {
+    for (let artist of entry.artists) {
+      allTimeUniqueArtists.add(artist)
+    }
   }
+  const totalUniqueArtistsCount = allTimeUniqueArtists.size
+
+  // Create objects for total concerts and unique artists
+  const totalConcerts = {
+    count: currentYearCount,
+    percentChange,
+    change,
+    changeType,
+    total: totalEntriesCount,
+  }
+
+  const uniqueArtists = {
+    count: currentYearUniqueCount,
+    percentChange: uniquePercentChange,
+    change: uniqueChange,
+    changeType: uniqueChangeType,
+    total: totalUniqueArtistsCount,
+  }
+
+  return { totalConcerts, uniqueArtists }
 }
 
 function calculateTopArtistsAndVenues(entries, artists, dateRange) {
@@ -270,19 +323,19 @@ app.get('/stats', async (req, res) => {
   const stats = yearStats(allEntries.items)
 
   res.json({
-    year: {
-      num: `${stats.currentYearCount}`,
-      pct:
-        stats.percentChange > 0
-          ? `${Math.floor(stats.percentChange)}% more than last year`
-          : `${Math.floor(Math.abs(stats.percentChange))}% less than last year`,
+    concerts: {
+      num: stats.totalConcerts.count,
+      pct: stats.totalConcerts.percentChange,
+      change: stats.totalConcerts.change,
+      changeType: stats.totalConcerts.changeType,
+      total: stats.totalConcerts.total,
     },
-    unique: {
-      num: `${stats.unique}`,
-      pct:
-        stats.uniquePercent > 0
-          ? `${Math.floor(stats.uniquePercent)}% more than last year`
-          : `${Math.floor(Math.abs(stats.uniquePercent))}% less than last year`,
+    artists: {
+      num: stats.uniqueArtists.count,
+      pct: stats.uniqueArtists.percentChange,
+      change: stats.uniqueArtists.change,
+      changeType: stats.uniqueArtists.changeType,
+      total: stats.uniqueArtists.total,
     },
   })
 })

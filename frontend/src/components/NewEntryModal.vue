@@ -3,7 +3,7 @@
     <label for="entryModal" class="btn btn-ghost btn-circle">+</label>
     <input type="checkbox" v-model="open" id="entryModal" class="modal-toggle" />
     <div class="modal">
-      <div class="modal-box flex max-w-none w-3/5 h-3/4 justify-center">
+      <div class="modal-box flex max-w-none w-3/5 h-5/6 justify-center">
         <form method="dialog" class="text-center w-3/5">
           <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeModal">✕</button>
           <p v-if="newError !== ''" class="">{{ this.newError }}</p>
@@ -89,7 +89,7 @@
           venue: this.newVenue,
           date: this.newEntryDate,
         })
-        this.$router.push('/entry/' + response.data.id)
+        this.$router.push('/entry/' + response.data.id + '?notify=created')
         this.open = false
       },
       updateArtistsNew() {

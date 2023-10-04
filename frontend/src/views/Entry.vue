@@ -1,8 +1,17 @@
 <template>
   <div>
+    <div v-if="toast" class="toast toast-top toast-end" style="z-index: 51">
+      <div class="alert alert-success">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>Entry created!</span>
+      </div>
+    </div>
     <!-- Navbar Component -->
     <Navbar />
     <div class="container mx-auto flex flex-col items-center justify-center w-6/12">
+      <button @click="this.$router.push('/')" class="btn btn-outline btn-secondary outline-secondary mt-5 mr-auto">🏠 Home</button>
       <p v-if="error !== ''" class="">{{ this.error }}</p>
 
       <!-- Artists -->
@@ -61,7 +70,7 @@
         placeholder="Comments"></textarea>
 
       <!-- Share and Delete -->
-      <div class="w-full mt-5 flex justify-between items-center">
+      <div class="w-full mt-5 mb-5 flex justify-between items-center">
         <div class="mt-5">
           <Share :artists="artists" :venue="venue" :date="entryDate" :media="media" />
         </div>
@@ -71,7 +80,7 @@
       </div>
 
       <!-- Upload -->
-      <div class="w-full mt-5 mb-20">
+      <div class="w-full mt-6 mb-20">
         <Upload :id="id" :artists="artists" @addedMedia="newMedia" />
         <div class="flex space-x-2 overflow-x-auto mt-2">
           <div v-for="img in media" :key="img" class="relative group">
@@ -151,6 +160,7 @@
         second: true,
         deleteOpen: false,
         error: '',
+        toast: false,
       }
     },
     watch: {
@@ -177,6 +187,12 @@
       this.media = response.data.media
       this.rate[response.data.rating] = true
       await this.form.refresh()
+    },
+    created() {
+      if (this.$route.query.notify === 'created') {
+        this.toast = true
+        setTimeout(() => (this.toast = false), 2000)
+      }
     },
     methods: {
       updateComment: _debounce(function (value) {

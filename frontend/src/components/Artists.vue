@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="container flex">
-      <div class="col my-auto"><p class="text-3xl">Top Artists</p></div>
+      <div class="col my-auto"><p class="text-3xl">Most Seen Artists</p></div>
       <div class="col ml-auto">
         <div class="dropdown dropdown-end">
           <select v-model="artistSelected" @change="artistChange" class="select focus:outline-none">
@@ -17,8 +17,8 @@
         @click="toArtist(artists[0].artist)"
         class="col-span-2 row-span-2 aspect-square overflow-hidden relative rounded-3xl hover:cursor-pointer">
         <img class="object-cover w-full h-full opacity-60" :src="artists[0].media" />
-        <figcaption class="absolute px-7 text-center text-lg text-white top-5 hover:underline">{{ artists[0].artist }}</figcaption>
-        <figcaption class="absolute px-7 text-center text-sm text-white top-12">{{ artists[0].count }} Times</figcaption>
+        <figcaption class="absolute pl-5 text-center text-lg text-white top-1 hover:underline">{{ artists[0].artist }}</figcaption>
+        <figcaption class="absolute pl-5 text-center text-sm text-white top-7">{{ artists[0].count }} Times</figcaption>
       </div>
       <div
         v-for="i of [...Array(4).keys()]"
@@ -26,12 +26,12 @@
         @click="toArtist(artists[i + 1].artist)"
         class="aspect-square overflow-hidden relative rounded-3xl hover:cursor-pointer">
         <img class="object-cover w-full h-full opacity-60" :src="artists[i + 1].media" />
-        <figcaption class="absolute px-4 text-center text-sm text-white top-5 hover:underline">{{ artists[i + 1].artist }}</figcaption>
-        <figcaption class="absolute px-4 text-center text-xs text-white top-10">{{ artists[i + 1].count }} Times</figcaption>
+        <figcaption class="absolute pl-3 text-center text-sm text-white top-2 hover:underline">{{ artists[i + 1].artist }}</figcaption>
+        <figcaption class="absolute pl-3 text-center text-xs text-white top-6">{{ artists[i + 1].count }} Times</figcaption>
       </div>
     </div>
-    <div class="container flex mt-6">
-      <div class="col my-auto"><p class="text-3xl">Top Venues</p></div>
+    <div class="container flex mt-8">
+      <div class="col my-auto"><p class="text-3xl">Most Visited Venues</p></div>
       <div class="col ml-auto">
         <select v-model="venueSelected" @change="venueChange" class="select focus:outline-none">
           <option selected value="allTime">All Time</option>
@@ -45,8 +45,8 @@
         @click="toVenue(venues[0].venue)"
         class="col-span-2 row-span-2 aspect-square overflow-hidden relative rounded-3xl hover:cursor-pointer">
         <img class="object-cover w-full h-full opacity-60" :src="venues[0].media" />
-        <figcaption class="absolute px-7 text-center text-lg text-white top-5 hover:underline">{{ venues[0].venue }}</figcaption>
-        <figcaption class="absolute px-7 text-center text-sm text-white top-12">{{ venues[0].count }} Times</figcaption>
+        <figcaption class="absolute pl-5 text-center text-lg text-white top-1 hover:underline">{{ venues[0].venue }}</figcaption>
+        <figcaption class="absolute pl-5 text-center text-sm text-white top-7">{{ venues[0].count }} Times</figcaption>
       </div>
 
       <div
@@ -55,10 +55,10 @@
         @click="toVenue(venues[i + 1].venue)"
         class="aspect-square overflow-hidden relative rounded-3xl hover:cursor-pointer">
         <img class="object-cover w-full h-full opacity-60" :src="venues[i + 1].media" />
-        <figcaption class="absolute px-4 text-center text-sm text-white top-5 hover:underline">
+        <figcaption class="absolute pl-3 text-center text-sm text-white top-2 hover:underline">
           {{ venues[i + 1].venue }}
         </figcaption>
-        <figcaption class="absolute px-4 text-center text-xs text-white top-10">{{ venues[i + 1].count }} Times</figcaption>
+        <figcaption class="absolute pl-3 text-center text-xs text-white top-6">{{ venues[i + 1].count }} Times</figcaption>
       </div>
     </div>
   </div>
@@ -75,8 +75,6 @@
       return {
         artists: Array(5).fill({}),
         venues: Array(5).fill({}),
-        rangeArtist: ['allTime', 'lastYear', 'lastDecade'],
-        rangeVenue: ['allTime', 'lastYear', 'lastDecade'],
         venueSelected: 'allTime',
         artistSelected: 'allTime',
         url: import.meta.env.VITE_API,

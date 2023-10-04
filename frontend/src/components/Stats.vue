@@ -1,19 +1,29 @@
 <template>
-  <div class="container flex">
-    <div class="mx-auto">
-      <div class="stats bg-accent text-primary-content">
-        <div class="stat">
-          <div class="stat-title text-primary-content">Concerts This Year</div>
-          <div class="stat-value">{{ year.num }}</div>
-          <div class="stat-desc text-primary-content">{{ year.pct }}</div>
-        </div>
+  <div>
+    <div class="stats bg-accent text-primary-content">
+      <div class="stat place-items-center">
+        <div class="stat-title text-primary-content">Concerts</div>
+        <div class="stat-value">{{ concertStats.total }}</div>
+        <div class="stat-desc text-secondary"></div>
       </div>
-      <div class="ml-5 stats bg-primary text-primary-content">
-        <div class="stat">
-          <div class="stat-title text-primary-content">Unique Artists</div>
-          <div class="stat-value">{{ unique.num }}</div>
-          <div class="stat-desc text-primary-content">{{ unique.pct }}</div>
-        </div>
+
+      <div class="stat place-items-center text-primary-content">
+        <div class="stat-title text-primary-content">This Year</div>
+        <div class="stat-value">{{ concertStats.year }}</div>
+        <div class="stat-desc text-primary-content">{{ concertStats.yearText }}</div>
+      </div>
+    </div>
+    <div class="stats bg-primary text-primary-content">
+      <div class="stat place-items-center">
+        <div class="stat-title text-primary-content">Artists</div>
+        <div class="stat-value">{{ artistStats.total }}</div>
+        <div class="stat-desc text-secondary"></div>
+      </div>
+
+      <div class="stat place-items-center text-primary-content">
+        <div class="stat-title text-primary-content">This Year</div>
+        <div class="stat-value">{{ artistStats.year }}</div>
+        <div class="stat-desc text-primary-content">{{ artistStats.yearText }}</div>
       </div>
     </div>
   </div>
@@ -26,14 +36,33 @@
     name: 'Stats',
     data() {
       return {
-        year: {},
-        unique: {},
+        concertStats: {},
+        artistStats: {},
       }
     },
     async beforeMount() {
       const response = await axios.get(import.meta.env.VITE_API + '/stats')
-      this.year = response.data.year
-      this.unique = response.data.unique
+      const concertRes = response.data.concerts
+      const artistRes = response.data.artists
+      let arrow = '-'
+      if (concertRes.changeType === 'increase') arrow = '↗︎'
+      else if (concertRes.changeType === 'decrease') arrow = '↘︎'
+
+      this.concertStats = {
+        total: concertRes.total,
+        year: concertRes.num,
+        yearText: arrow + ' (' + concertRes.change + ') ' + concertRes.pct + '%',
+      }
+
+      let arrow2 = '-'
+      if (artistRes.changeType === 'increase') arrow2 = '↗︎'
+      else if (artistRes.changeType === 'decrease') arrow2 = '↘︎'
+
+      this.artistStats = {
+        total: artistRes.total,
+        year: artistRes.num,
+        yearText: arrow2 + ' (' + artistRes.change + ') ' + artistRes.pct + '%',
+      }
     },
   }
 </script>

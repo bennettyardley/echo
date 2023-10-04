@@ -1,13 +1,20 @@
 <template>
   <div>
     <Navbar />
-    <div class="container mx-auto max-w-3xl py-4">
-      <div class="stats bg-secondary text-primary-content">
+    <div class="container mx-auto max-w-3xl">
+      <button @click="this.$router.push('/')" class="btn btn-outline btn-secondary outline-secondary mt-5 mr-auto max-w-3xl">
+        🏠 Home
+      </button>
+    </div>
+    <div class="container flex mx-auto max-w-3xl py-4">
+      <div class="stats bg-secondary mx-auto text-primary-content">
         <div class="stat">
           <div class="stat-title text-primary-content">Times Visited</div>
           <div class="stat-value">{{ count }}</div>
         </div>
       </div>
+    </div>
+    <div class="container mx-auto max-w-3xl py-4">
       <div class="card mt-4 card-bordered overflow-hidden">
         <table v-if="table.length === 0" class="table">
           <tbody>
