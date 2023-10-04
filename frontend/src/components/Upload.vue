@@ -47,9 +47,16 @@
   import FilePondPluginImagePreview from 'filepond-plugin-image-preview'
   import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type'
 
+  import { keyStore } from '../stores/key'
+
   const FilePond = vueFilePond(FilePondPluginImagePreview, FilePondPluginFileValidateType)
 
   export default {
+    setup() {
+      const key = keyStore()
+
+      return { key }
+    },
     name: 'Upload',
     components: {
       FilePond,
@@ -142,7 +149,7 @@
 
       async uploadFileInChunks(file) {
         return new Promise(async (resolve, reject) => {
-          const dataKey = import.meta.env.VITE_DETA
+          const dataKey = this.key.apiKey
           const projectId = dataKey.split('_')[0]
           const headers = { 'X-API-Key': dataKey }
           const drive = `https://drive.deta.sh/v1/${projectId}/echo`

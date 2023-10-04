@@ -525,6 +525,10 @@ app.get('/image/:name', async (req, res) => {
   res.send(Buffer.from(buffer))
 })
 
+app.get('/key', async (req, res) => {
+  res.json({ key: process.env.DETA_PROJECT_KEY })
+})
+
 app.listen(port, () => {
   console.log(`App listening on port ${port}!`)
 })

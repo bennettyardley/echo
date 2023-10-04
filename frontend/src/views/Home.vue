@@ -14,8 +14,17 @@
   import Entries from '../components/Entries.vue'
   import Stats from '../components/Stats.vue'
   import Artists from '../components/Artists.vue'
+  import { keyStore } from '../stores/key'
 
   export default {
+    setup() {
+      const key = keyStore()
+
+      return { key }
+    },
+    async beforeMount() {
+      if (this.key.apiKey === '') await this.key.refresh()
+    },
     components: {
       Navbar,
       Entries,
