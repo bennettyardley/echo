@@ -15,7 +15,11 @@
       style="width: 800px; height: 1200px; position: absolute; left: -9999px">
  <!--   <div ref="contentToCapture" class="rounded-3xl overflow-hidden" :class="randColor" style="width: 800px; height: 1200px"> -->
         <div class="px-2" style="height: 400px">
-          <p class="text-8xl uppercase font-bold">Venue</p>
+          <p class="text-8xl uppercase font-bold">{{venue}}</p>
+          <p class="text-3xl">presents</p>
+        <div class="grid grid-cols-2 gap-4 mt-5">
+          <p v-for="artist in artists" class="text-5xl">{{ artist }}</p>
+        </div>
       </div>
       <div class="overflow-hidden logo-preview-inner" style="height: 400px">
         <img class="" :src="img" />
