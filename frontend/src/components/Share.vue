@@ -19,8 +19,8 @@
         <p class="text-3xl">presents</p>
         <p class="text-5xl mt-5">{{ artists.join(', ') }}</p>
       </div>
-      <div class="overflow-hidden" style="height: 400px">
-        <img class="object-cover w-full h-full" :src="img" />
+      <div class="overflow-hidden logo-preview-inner" style="height: 400px">
+        <img class="" :src="img" />
       </div>
       <div class="flex flex-col px-2" style="height: 400px">
         <div class="flex flex-row h-full">
@@ -102,5 +102,19 @@
     padding: 7px;
     color: #e9e5ff;
     letter-spacing: 5px;
+  }
+
+  .logo-preview-inner {
+    height: 400px;
+    width: 800px;
+    margin: 0 auto;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .logo-preview-inner img {
+    width: 100%;
   }
 </style>
