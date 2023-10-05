@@ -1,7 +1,7 @@
 ---
 app_name: "Echo"
 title: "Echo"
-tagline: "Where Concert Memories Reside"
+tagline: "Where concert memories reside"
 theme_color: "#302f3d"
 git: "https://github.com/bennettyardley/echo"
 ---

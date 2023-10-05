@@ -8,17 +8,46 @@
       Share
     </button>
 
-   <div
+    <div
+      ref="contentToCapture"
+      v-if="artists.length > 6"
+      class="rounded-3xl overflow-hidden"
+      :class="randColor"
+      style="width: 800px; height: 1200px; position: absolute; left: -9999px">
+      <!-- <div ref="contentToCapture" v-if="artists.length > 6" class="rounded-3xl overflow-hidden" :class="randColor" style="width: 800px"> -->
+      <div class="px-2 overflow-visible">
+        <p class="text-8xl uppercase font-bold">{{ venue }}</p>
+        <p class="text-3xl">presents</p>
+        <div class="grid grid-cols-3 gap-3 mt-5">
+          <p v-for="artist in artists" :key="artist" class="text-4xl">{{ artist }}</p>
+        </div>
+      </div>
+      <div class="overflow-hidden logo-preview-inner" style="height: 400px">
+        <img class="" :src="img" />
+      </div>
+      <div class="flex flex-col px-2" style="height: 400px">
+        <div class="flex flex-row h-full">
+          <div class="my-auto">
+            <p class="text-3xl">date</p>
+            <p class="text-7xl uppercase font-bold">{{ dateStr }}</p>
+          </div>
+        </div>
+        <div class="name">Echo</div>
+      </div>
+    </div>
+
+    <div
+      v-else
       ref="contentToCapture"
       class="rounded-3xl overflow-hidden"
       :class="randColor"
       style="width: 800px; height: 1200px; position: absolute; left: -9999px">
- <!--   <div ref="contentToCapture" class="rounded-3xl overflow-hidden" :class="randColor" style="width: 800px; height: 1200px"> -->
-        <div class="px-2" style="height: 400px">
-          <p class="text-8xl uppercase font-bold">{{venue}}</p>
-          <p class="text-3xl">presents</p>
+      <!-- <div v-else ref="contentToCapture" class="rounded-3xl overflow-hidden" :class="randColor" style="width: 800px; height: 1200px"> -->
+      <div class="px-2" style="height: 400px">
+        <p class="text-8xl uppercase font-bold">{{ venue }}</p>
+        <p class="text-3xl">presents</p>
         <div class="grid grid-cols-2 gap-4 mt-5">
-          <p v-for="artist in artists" class="text-5xl">{{ artist }}</p>
+          <p v-for="artist in artists" :key="artist" :class="artists.length < 3 ? 'text-6xl' : 'text-4xl'">{{ artist }}</p>
         </div>
       </div>
       <div class="overflow-hidden logo-preview-inner" style="height: 400px">
@@ -47,7 +76,7 @@
         dateStr: new Date().toDateString(),
         img: defaultImg,
         url: import.meta.env.VITE_API,
-        colors: ['bg-primary', 'bg-secondary', 'bg-accent'],
+        colors: ['bg-primary', 'bg-secondary', 'bg-success', 'bg-warning'],
         randColor: '',
       }
     },
