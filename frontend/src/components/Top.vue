@@ -12,7 +12,7 @@
         </div>
       </div>
     </div>
-    <div class="grid grid-rows-2 grid-cols-4 gap-2 pt-8">
+    <div class="grid md:grid-rows-2 md:grid-cols-4 gap-2 pt-8">
       <div
         @click="toArtist(artists[0].artist)"
         class="col-span-2 row-span-2 aspect-square overflow-hidden relative rounded-3xl hover:cursor-pointer">
@@ -40,7 +40,7 @@
         </select>
       </div>
     </div>
-    <div class="grid grid-rows-2 grid-cols-4 gap-2 pt-8">
+    <div class="grid md:grid-rows-2 md:grid-cols-4 gap-2 pt-8">
       <div
         @click="toVenue(venues[0].venue)"
         class="col-span-2 row-span-2 aspect-square overflow-hidden relative rounded-3xl hover:cursor-pointer">
@@ -70,7 +70,7 @@
   const defaultImg = new URL('../assets/missingVenue.jpg', import.meta.url)
 
   export default {
-    name: 'Artists',
+    name: 'Top',
     data() {
       return {
         artists: Array(5).fill({}),

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <input type="text" class="input input-bordered border-neutral mb-2" v-model="query" placeholder="Search" />
+    <input type="text" class="input input-bordered border-neutral mb-2" v-model="query" placeholder="🔍 Search" />
     <div class="card card-bordered overflow-hidden">
       <table v-if="table.length === 0" class="table">
         <tbody>

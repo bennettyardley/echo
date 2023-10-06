@@ -3,7 +3,7 @@
     <label for="entryModal" class="btn btn-ghost btn-circle">+</label>
     <input type="checkbox" v-model="open" id="entryModal" class="modal-toggle" />
     <div class="modal">
-      <div class="modal-box flex max-w-none w-3/5 h-5/6 justify-center">
+      <div class="modal-box flex max-w-3xl h-full justify-center">
         <form method="dialog" class="text-center w-3/5">
           <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeModal">✕</button>
           <p v-if="newError !== ''" class="">{{ this.newError }}</p>
@@ -31,10 +31,12 @@
             <VueDatePicker
               :enable-time-picker="false"
               position="center"
+              teleport-center
               v-model="newEntryDate"
               class="outline outline-secondary rounded"
               dark />
           </div>
+          <div class="mt-5"></div>
           <div class="absolute inset-x-0 bottom-5">
             <button class="btn btn-primary" @click="submit">ADD New Entry</button>
           </div>

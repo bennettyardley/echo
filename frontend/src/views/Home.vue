@@ -4,7 +4,7 @@
     <div class="container mx-auto max-w-3xl">
       <Stats class="py-4" />
       <Entries class="py-4" />
-      <Artists class="py-4 mb-20" />
+      <Top class="py-4 mb-20" />
     </div>
   </div>
 </template>
@@ -13,7 +13,7 @@
   import Navbar from '../components/Navbar.vue'
   import Entries from '../components/Entries.vue'
   import Stats from '../components/Stats.vue'
-  import Artists from '../components/Artists.vue'
+  import Top from '../components/Top.vue'
   import { keyStore } from '../stores/key'
 
   export default {
@@ -29,7 +29,7 @@
       Navbar,
       Entries,
       Stats,
-      Artists,
+      Top,
     },
   }
 </script>

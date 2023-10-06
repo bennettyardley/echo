@@ -10,7 +10,7 @@
     </div>
     <!-- Navbar Component -->
     <Navbar />
-    <div class="container mx-auto flex flex-col items-center justify-center w-6/12">
+    <div class="container mx-auto flex flex-col items-center justify-center max-w-3xl">
       <button @click="this.$router.push('/')" class="btn btn-outline btn-secondary outline-secondary mt-5 mr-auto">🏠 Home</button>
       <p v-if="error !== ''" class="">{{ this.error }}</p>
 
@@ -133,14 +133,16 @@
       <!-- Delete Modal -->
       <input type="checkbox" v-model="deleteOpen" id="deleteModal" class="modal-toggle" />
       <div class="modal">
-        <div class="modal-box flex flex-col justify-between max-w-none w-1/5 h-1/4">
+        <div class="modal-box flex flex-col justify-between max-w-xs">
           <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeDeleteModal">✕</button>
           <div>
             <p class="text-center mt-2">Are you sure you want to delete?</p>
           </div>
+          <br />
           <div class="flex justify-between mt-4">
-            <button class="btn btn-outline" @click="closeDeleteModal">No</button>
             <button class="btn btn-error" @click="deleteEntry">Yes</button>
+
+            <button class="btn btn-outline" @click="closeDeleteModal">No</button>
           </div>
         </div>
         <label class="modal-backdrop" for="deleteModal">Close</label>

@@ -12,11 +12,12 @@
 
     <input type="checkbox" v-model="artistModal" id="artistModal" class="modal-toggle" />
     <div class="modal">
-      <div class="modal-box flex flex-col justify-between max-w-none w-5/12 h-3/4">
+      <div class="modal-box flex flex-col justify-between max-w-s">
         <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeArtistModal">✕</button>
 
         <!-- Prompt -->
         <p class="text-center mt-4">Heads Up! This event had multiple artists, was that picture of a specific artist?</p>
+        <br />
 
         <!-- Centered artist list with Select All button -->
         <div class="flex flex-col mx-auto">
